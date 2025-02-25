@@ -20,7 +20,7 @@ const Hero = () => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.2 }}
         >
-          EveryID: a repository for the recognition of people, objects, scenes and events. Moving beyond retrieval to recognition, we aim to give machines the same gift of invariant representation that humans possess.
+          A repository for the recognition of people, objects, scenes and events. Moving beyond retrieval to recognition, we aim to give machines the same gift of invariant representation that humans possess.
         </motion.p>
         <motion.div 
           className="flex flex-wrap justify-center gap-4"
