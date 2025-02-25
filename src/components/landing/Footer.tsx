@@ -15,11 +15,12 @@ const Footer = () => {
           </div>
           
           <div>
-            <h4 className="font-semibold mb-4">Product</h4>
+            <h4 className="font-semibold mb-4">Applications</h4>
             <ul className="space-y-3 text-sm text-neutral-600">
-              <li><a href="#" className="hover:text-primary transition-colors">Features</a></li>
-              <li><a href="#" className="hover:text-primary transition-colors">Pricing</a></li>
-              <li><a href="#" className="hover:text-primary transition-colors">Documentation</a></li>
+              <li><a href="#" className="hover:text-primary transition-colors">TV Post Production</a></li>
+              <li><a href="#" className="hover:text-primary transition-colors">Surveillance</a></li>
+              <li><a href="#" className="hover:text-primary transition-colors">Intelligence & Defense</a></li>
+              <li><a href="#" className="hover:text-primary transition-colors">Agent AI Frameworks</a></li>
             </ul>
           </div>
 
@@ -27,17 +28,19 @@ const Footer = () => {
             <h4 className="font-semibold mb-4">Company</h4>
             <ul className="space-y-3 text-sm text-neutral-600">
               <li><a href="#" className="hover:text-primary transition-colors">About</a></li>
-              <li><a href="#" className="hover:text-primary transition-colors">Blog</a></li>
+              <li><a href="#" className="hover:text-primary transition-colors">Vision</a></li>
+              <li><a href="#" className="hover:text-primary transition-colors">Research</a></li>
               <li><a href="#" className="hover:text-primary transition-colors">Careers</a></li>
             </ul>
           </div>
 
           <div>
-            <h4 className="font-semibold mb-4">Legal</h4>
+            <h4 className="font-semibold mb-4">Resources</h4>
             <ul className="space-y-3 text-sm text-neutral-600">
+              <li><a href="#" className="hover:text-primary transition-colors">Documentation</a></li>
+              <li><a href="#" className="hover:text-primary transition-colors">API</a></li>
               <li><a href="#" className="hover:text-primary transition-colors">Privacy</a></li>
               <li><a href="#" className="hover:text-primary transition-colors">Terms</a></li>
-              <li><a href="#" className="hover:text-primary transition-colors">License</a></li>
             </ul>
           </div>
         </div>

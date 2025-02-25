@@ -20,7 +20,7 @@ const Hero = () => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.2 }}
         >
-          We aim to give machines the same gift of invariant representation that humans possess — solving the complex challenges of recognition across changing conditions.
+          Moving beyond retrieval to recognition: We aim to give machines the same gift of invariant representation that humans possess — solving complex recognition challenges across TV production, surveillance, intelligence, and next-generation AI agents.
         </motion.p>
         <motion.div 
           className="flex flex-wrap justify-center gap-4"
@@ -29,10 +29,10 @@ const Hero = () => {
           transition={{ duration: 0.5, delay: 0.4 }}
         >
           <button className="button-primary flex items-center gap-2">
-            Explore Our Vision
+            Explore Applications
           </button>
           <button className="px-6 py-3 border border-neutral-300 rounded-lg hover:bg-neutral-200/50 transition-colors">
-            Learn More
+            Our Vision
           </button>
         </motion.div>
       </div>
