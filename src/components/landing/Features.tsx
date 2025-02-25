@@ -1,12 +1,13 @@
+
 import { Check } from "lucide-react";
 import { Card } from "@/components/ui/card";
 
 const Features = () => {
   const features = [
     {
-      title: "Intelligent Task Management",
-      description: "Streamline your tasks and collaborate seamlessly with our cutting-edge SaaS startup platform.",
-      points: ["Smart Task Assignment", "Real-time Collaboration", "Data Security & Privacy"]
+      title: "Recognition Technology",
+      description: "Our transformative AI identifies patterns across time and space, enabling unprecedented accuracy in person re-identification.",
+      points: ["Invariant Representation", "Multi-camera Tracking", "Context-aware Analysis"]
     },
     {
       title: "Advanced Analytics",
@@ -20,11 +21,11 @@ const Features = () => {
       <div className="container-padding">
         <div className="text-center mb-16">
           <span className="bg-accent-purple/10 text-accent-purple px-4 py-1.5 rounded-full text-sm font-medium">
-            TWO-COL FEATURES
+            CORE TECHNOLOGY
           </span>
-          <h2 className="heading-lg mt-6">Supercharge Your Workflows</h2>
+          <h2 className="heading-lg mt-6">Beyond Current Recognition Limits</h2>
           <p className="text-neutral-600 mt-4 max-w-2xl mx-auto">
-            Unlock your team's true potential with our state-of-the-art SaaS platform.
+            Solving complex recognition challenges with transformative AI technology.
           </p>
         </div>
 
@@ -44,9 +45,9 @@ const Features = () => {
                 ))}
               </ul>
               <div className="mt-8 flex gap-4">
-                <button className="button-primary">Start 14-day trial</button>
+                <button className="button-primary">Request Demo</button>
                 <button className="px-6 py-3 text-neutral-600 hover:text-primary transition-colors">
-                  Contact Sales
+                  Learn More
                 </button>
               </div>
             </div>
