@@ -7,7 +7,7 @@ const Footer = () => {
           <div>
             <div className="flex items-center gap-2 mb-6">
               <div className="w-8 h-8 bg-primary rounded-full"></div>
-              <span className="text-xl font-semibold">Lovely</span>
+              <span className="text-xl font-semibold">EveryID</span>
             </div>
             <p className="text-neutral-600 text-sm">
               Transforming recognition through advanced AI
@@ -44,7 +44,7 @@ const Footer = () => {
 
         <div className="border-t border-neutral-200 mt-12 pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
           <p className="text-sm text-neutral-600">
-            © 2024 Lovely. All rights reserved.
+            © 2024 EveryID. All rights reserved.
           </p>
           <div className="flex gap-6">
             <a href="#" className="text-neutral-600 hover:text-primary transition-colors">
