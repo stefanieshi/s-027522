@@ -1,3 +1,4 @@
+
 const Footer = () => {
   return (
     <footer className="border-t border-neutral-200 bg-white">
@@ -9,7 +10,7 @@ const Footer = () => {
               <span className="text-xl font-semibold">Lovely</span>
             </div>
             <p className="text-neutral-600 text-sm">
-              Modern SaaS Platform for Businesses
+              Transforming recognition through advanced AI
             </p>
           </div>
           
