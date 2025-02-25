@@ -136,7 +136,7 @@ const Index = () => {
           >
             <h2 className="heading-lg mb-4">Our Vision</h2>
             <p className="text-neutral-600">
-              Beyond retrieval, toward recognition
+              EveryID: a repository for the recognition of people, objects, scenes and events
             </p>
           </motion.div>
           
