@@ -1,36 +1,51 @@
 
 import { Check } from "lucide-react";
 import { Card } from "@/components/ui/card";
+import { motion } from "framer-motion";
 
 const Features = () => {
   const features = [
     {
       title: "Recognition Technology",
       description: "Our transformative AI identifies patterns across time and space, enabling unprecedented accuracy in person re-identification.",
-      points: ["Invariant Representation", "Multi-camera Tracking", "Context-aware Analysis"]
+      points: ["Invariant Representation", "Multi-camera Tracking", "Context-aware Analysis"],
+      imageUrl: "/placeholder.svg"
     },
     {
-      title: "Advanced Analytics",
-      description: "Harness the power of AI-driven analytics to optimize your campaigns and understand your audience better.",
-      points: ["Smart Audience Segmentation", "Predictive Performance", "Real-time Visualization"]
+      title: "Beyond Current Limits",
+      description: "We're pushing transformer models beyond their current capabilities to create true recognition systems.",
+      points: ["Temporal Consistency", "Appearance Invariance", "Cross-Domain Recognition"],
+      imageUrl: "/placeholder.svg"
     }
   ];
 
   return (
-    <section className="py-24">
+    <section className="py-24 bg-white">
       <div className="container-padding">
         <div className="text-center mb-16">
-          <span className="bg-accent-purple/10 text-accent-purple px-4 py-1.5 rounded-full text-sm font-medium">
-            CORE TECHNOLOGY
-          </span>
-          <h2 className="heading-lg mt-6">Beyond Current Recognition Limits</h2>
-          <p className="text-neutral-600 mt-4 max-w-2xl mx-auto">
-            Solving complex recognition challenges with transformative AI technology.
-          </p>
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+          >
+            <span className="bg-accent-purple/10 text-accent-purple px-4 py-1.5 rounded-full text-sm font-medium">
+              CORE TECHNOLOGY
+            </span>
+            <h2 className="heading-lg mt-6">Beyond Current Recognition Limits</h2>
+            <p className="text-neutral-600 mt-4 max-w-2xl mx-auto">
+              Solving complex recognition challenges with transformative AI technology.
+            </p>
+          </motion.div>
         </div>
 
         {features.map((feature, index) => (
-          <div key={feature.title} className={`flex flex-col md:flex-row gap-12 items-center mb-24 ${index % 2 === 1 ? 'md:flex-row-reverse' : ''}`}>
+          <motion.div 
+            key={feature.title} 
+            className={`flex flex-col md:flex-row gap-12 items-center mb-24 ${index % 2 === 1 ? 'md:flex-row-reverse' : ''}`}
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.2 + index * 0.2 }}
+          >
             <div className="flex-1">
               <h3 className="text-2xl font-bold mb-4">{feature.title}</h3>
               <p className="text-neutral-600 mb-6">{feature.description}</p>
@@ -54,13 +69,13 @@ const Features = () => {
             <div className="flex-1">
               <Card className="glass-panel p-6 rounded-2xl">
                 <img 
-                  src="/placeholder.svg" 
+                  src={feature.imageUrl} 
                   alt={feature.title}
                   className="w-full h-auto rounded-lg"
                 />
               </Card>
             </div>
-          </div>
+          </motion.div>
         ))}
       </div>
     </section>

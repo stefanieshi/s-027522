@@ -29,9 +29,11 @@ const Hero = () => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.4 }}
         >
-          <button className="button-primary flex items-center gap-2">
-            Explore Applications
-          </button>
+          <a href="#applications">
+            <button className="button-primary flex items-center gap-2">
+              Explore Applications
+            </button>
+          </a>
           <Link to="/vision">
             <button className="px-6 py-3 border border-neutral-300 rounded-lg hover:bg-neutral-200/50 transition-colors">
               Our Vision
