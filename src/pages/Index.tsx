@@ -124,49 +124,6 @@ const Index = () => {
           </div>
         </div>
       </section>
-
-      {/* Vision Section */}
-      <section className="container-padding py-20 bg-neutral-50">
-        <div className="max-w-4xl mx-auto">
-          <motion.div 
-            className="text-center mb-12"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
-          >
-            <h2 className="heading-lg mb-4">Our Vision</h2>
-            <p className="text-neutral-600">
-              EveryID: a repository for the recognition of people, objects, scenes and events
-            </p>
-          </motion.div>
-          
-          <motion.div
-            className="prose prose-neutral max-w-none"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.2 }}
-          >
-            <p className="text-lg mb-6">
-              Current AI agents rely heavily on retrieval of information to answer questions and perform tasks. This paradigm is fundamentally limited when it comes to making informed predictions about future events or planning complex sequences.
-            </p>
-            <p className="text-lg mb-6">
-              At EveryID, we're pioneering the shift to a <strong>recognition paradigm</strong> — moving beyond simple pattern matching to understand sequences of patterns across time. This allows our systems to predict likely futures based on recognition rather than mere similarity.
-            </p>
-            <p className="text-lg mb-6">
-              This recognition-based approach enables AI agents to:
-            </p>
-            <ul className="space-y-2 mb-6">
-              <li>• Create and dynamically adjust complex plans in response to new information</li>
-              <li>• Learn from failures through self-reinforcement mechanisms</li>
-              <li>• Develop true objective functions across time and space dimensions</li>
-              <li>• Move beyond the limitations of naive retrieval-augmented generation (RAG)</li>
-            </ul>
-            <p className="text-lg">
-              While our immediate focus is solving the fundamental challenge of person re-identification, our broader mission is to advance the entire field of recognition-based agent intelligence — bringing AI one step closer to the intuitive understanding demonstrated by the human brain.
-            </p>
-          </motion.div>
-        </div>
-      </section>
       
       <Footer />
     </div>

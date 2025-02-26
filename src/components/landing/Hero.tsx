@@ -1,5 +1,6 @@
 
 import { motion } from "framer-motion";
+import { Link } from "react-router-dom";
 
 const Hero = () => {
   return (
@@ -31,9 +32,11 @@ const Hero = () => {
           <button className="button-primary flex items-center gap-2">
             Explore Applications
           </button>
-          <button className="px-6 py-3 border border-neutral-300 rounded-lg hover:bg-neutral-200/50 transition-colors">
-            Our Vision
-          </button>
+          <Link to="/vision">
+            <button className="px-6 py-3 border border-neutral-300 rounded-lg hover:bg-neutral-200/50 transition-colors">
+              Our Vision
+            </button>
+          </Link>
         </motion.div>
       </div>
     </header>
