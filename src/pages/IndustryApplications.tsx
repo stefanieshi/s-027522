@@ -1,6 +1,6 @@
 
 import { motion } from "framer-motion";
-import { Factory, Users, Shield, Building2, BarChart3, Briefcase } from "lucide-react";
+import { Factory, Users, Shield, Building2, BarChart3, Briefcase, Tv, Video, Globe, Brain } from "lucide-react";
 import { toast } from "sonner";
 import Navigation from "@/components/landing/Navigation";
 import Footer from "@/components/landing/Footer";
@@ -63,8 +63,8 @@ const IndustryApplications = () => {
             </p>
           </motion.div>
           
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {/* Manufacturing Card */}
+          <div className="grid md:grid-cols-2 lg:grid-cols-2 gap-8">
+            {/* TV Post Production Card */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -74,21 +74,23 @@ const IndustryApplications = () => {
                 <div className="h-2 bg-[#0EA5E9] w-full"></div>
                 <CardContent className="p-8">
                   <div className="mb-6 p-3 bg-[#0EA5E9]/10 rounded-full w-16 h-16 flex items-center justify-center mx-auto">
-                    <Factory className="h-8 w-8 text-[#0EA5E9]" />
+                    <Tv className="h-8 w-8 text-[#0EA5E9]" />
                   </div>
-                  <h3 className="text-2xl font-bold mb-4 text-white text-center">Manufacturing</h3>
+                  <h3 className="text-2xl font-bold mb-4 text-white text-center">TV Post Production</h3>
                   
                   <div className="space-y-4 text-neutral-300">
                     <p className="leading-relaxed">
-                      Our recognition technology enhances manufacturing workflows by providing reliable employee identification across production environments, regardless of PPE, lighting conditions, or viewing angles.
+                      Transform your post-production workflows with intelligent content recognition that dramatically reduces manual effort while enhancing creative capabilities.
                     </p>
                     
                     <div className="bg-gradient-to-r from-[#0EA5E9]/10 to-transparent border-l-4 border-[#0EA5E9] rounded-r-xl p-4 mt-6">
-                      <h4 className="font-semibold text-white mb-2">Key Benefits</h4>
+                      <h4 className="font-semibold text-white mb-2">Key Capabilities</h4>
                       <ul className="list-disc pl-5 space-y-2">
-                        <li>Enhanced facility security and access control</li>
-                        <li>Accurate time and attendance tracking</li>
-                        <li>Streamlined authorization for equipment operation</li>
+                        <li>Automatic logging and syncing across multiple footage sources</li>
+                        <li>Instant searchability based on people, scenes, and concepts</li>
+                        <li>Knowledge graph generation for content clusters</li>
+                        <li>Context-aware tracking with probabilistic likelihood</li>
+                        <li>Real-time indexing of large productions</li>
                       </ul>
                     </div>
                   </div>
@@ -96,7 +98,7 @@ const IndustryApplications = () => {
               </Card>
             </motion.div>
             
-            {/* Public Safety Card */}
+            {/* Surveillance Card */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -106,21 +108,23 @@ const IndustryApplications = () => {
                 <div className="h-2 bg-[#8B5CF6] w-full"></div>
                 <CardContent className="p-8">
                   <div className="mb-6 p-3 bg-[#8B5CF6]/10 rounded-full w-16 h-16 flex items-center justify-center mx-auto">
-                    <Shield className="h-8 w-8 text-[#8B5CF6]" />
+                    <Video className="h-8 w-8 text-[#8B5CF6]" />
                   </div>
-                  <h3 className="text-2xl font-bold mb-4 text-white text-center">Public Safety</h3>
+                  <h3 className="text-2xl font-bold mb-4 text-white text-center">Surveillance</h3>
                   
                   <div className="space-y-4 text-neutral-300">
                     <p className="leading-relaxed">
-                      Our technology empowers public safety agencies with advanced person re-identification across multiple camera views, maintaining identity consistency even in challenging conditions.
+                      Our technology empowers security professionals with advanced person re-identification across complex camera networks, maintaining identity consistency even in challenging conditions.
                     </p>
                     
                     <div className="bg-gradient-to-r from-[#8B5CF6]/10 to-transparent border-l-4 border-[#8B5CF6] rounded-r-xl p-4 mt-6">
-                      <h4 className="font-semibold text-white mb-2">Key Benefits</h4>
+                      <h4 className="font-semibold text-white mb-2">Key Capabilities</h4>
                       <ul className="list-disc pl-5 space-y-2">
-                        <li>Seamless tracking across non-overlapping cameras</li>
-                        <li>Identification despite appearance changes</li>
-                        <li>Enhanced situational awareness in complex environments</li>
+                        <li>Track individuals across non-overlapping camera networks</li>
+                        <li>Maintain identity consistency despite appearance changes</li>
+                        <li>Handle crowded scenes and occlusions</li>
+                        <li>Process real-time video streams efficiently</li>
+                        <li>Scale to large camera networks</li>
                       </ul>
                     </div>
                   </div>
@@ -128,7 +132,7 @@ const IndustryApplications = () => {
               </Card>
             </motion.div>
             
-            {/* Retail Card */}
+            {/* Government Intelligence Card */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -138,21 +142,56 @@ const IndustryApplications = () => {
                 <div className="h-2 bg-[#D946EF] w-full"></div>
                 <CardContent className="p-8">
                   <div className="mb-6 p-3 bg-[#D946EF]/10 rounded-full w-16 h-16 flex items-center justify-center mx-auto">
-                    <Building2 className="h-8 w-8 text-[#D946EF]" />
+                    <Globe className="h-8 w-8 text-[#D946EF]" />
                   </div>
-                  <h3 className="text-2xl font-bold mb-4 text-white text-center">Retail</h3>
+                  <h3 className="text-2xl font-bold mb-4 text-white text-center">Government Intelligence</h3>
                   
                   <div className="space-y-4 text-neutral-300">
                     <p className="leading-relaxed">
-                      Transform customer experiences and optimize operations through our recognition technology that understands shopper behavior and enhances personalization without compromising privacy.
+                      Enhance intelligence capabilities with our advanced recognition platform that efficiently processes diverse data sources and integrates with existing systems.
                     </p>
                     
                     <div className="bg-gradient-to-r from-[#D946EF]/10 to-transparent border-l-4 border-[#D946EF] rounded-r-xl p-4 mt-6">
-                      <h4 className="font-semibold text-white mb-2">Key Benefits</h4>
+                      <h4 className="font-semibold text-white mb-2">Key Capabilities</h4>
                       <ul className="list-disc pl-5 space-y-2">
-                        <li>Enhanced customer journey analytics</li>
-                        <li>Optimized store layouts and staff allocation</li>
-                        <li>Improved loss prevention capabilities</li>
+                        <li>Rapid processing of surveillance footage</li>
+                        <li>Cross-referencing across multiple data sources</li>
+                        <li>Temporal analysis of movement patterns</li>
+                        <li>Integration with existing intelligence systems</li>
+                        <li>Handling of low-quality imagery</li>
+                      </ul>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </motion.div>
+            
+            {/* Agent-Based AI Frameworks Card */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.7 }}
+            >
+              <Card className="h-full bg-[#1a1a2f]/50 border-[#0EA5E9]/20 shadow-lg backdrop-blur-sm hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
+                <div className="h-2 bg-[#0EA5E9] w-full"></div>
+                <CardContent className="p-8">
+                  <div className="mb-6 p-3 bg-[#0EA5E9]/10 rounded-full w-16 h-16 flex items-center justify-center mx-auto">
+                    <Brain className="h-8 w-8 text-[#0EA5E9]" />
+                  </div>
+                  <h3 className="text-2xl font-bold mb-4 text-white text-center">Agent-Based AI Frameworks</h3>
+                  
+                  <div className="space-y-4 text-neutral-300">
+                    <p className="leading-relaxed">
+                      Our next-generation AI agent frameworks move beyond simple retrieval to sophisticated recognition and prediction capabilities for truly adaptive systems.
+                    </p>
+                    
+                    <div className="bg-gradient-to-r from-[#0EA5E9]/10 to-transparent border-l-4 border-[#0EA5E9] rounded-r-xl p-4 mt-6">
+                      <h4 className="font-semibold text-white mb-2">Key Capabilities</h4>
+                      <ul className="list-disc pl-5 space-y-2">
+                        <li>Moving from retrieval to recognition paradigms</li>
+                        <li>Enabling prediction of future events through pattern recognition</li>
+                        <li>Building agents that can adapt plans dynamically</li>
+                        <li>Creating self-reinforcement from failure</li>
                       </ul>
                     </div>
                   </div>
@@ -277,7 +316,7 @@ const IndustryApplications = () => {
           </motion.div>
           
           <div className="space-y-8">
-            {/* Case Study 1 */}
+            {/* Case Study 1 - TV Production */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -286,34 +325,34 @@ const IndustryApplications = () => {
               <Card className="bg-[#1a1a2f]/50 border-[#8B5CF6]/20 shadow-lg backdrop-blur-sm overflow-hidden">
                 <div className="grid md:grid-cols-2">
                   <div className="p-8">
-                    <div className="inline-block px-3 py-1 text-xs font-medium bg-[#8B5CF6]/20 text-[#8B5CF6] rounded-full mb-4">Manufacturing</div>
-                    <h3 className="text-2xl font-bold mb-4 text-white">Global Automotive Manufacturer</h3>
+                    <div className="inline-block px-3 py-1 text-xs font-medium bg-[#8B5CF6]/20 text-[#8B5CF6] rounded-full mb-4">TV Post Production</div>
+                    <h3 className="text-2xl font-bold mb-4 text-white">Major Broadcasting Network</h3>
                     <p className="text-neutral-300 mb-6">
-                      Implemented our recognition technology across 12 production facilities to enhance employee safety and optimize workflows.
+                      Deployed our recognition platform across their post-production department, dramatically improving content discovery and processing speeds.
                     </p>
                     <div className="space-y-3">
                       <div className="flex items-center gap-2">
-                        <div className="text-[#8B5CF6] font-semibold">98%</div>
-                        <div className="text-neutral-400 text-sm">Accuracy in challenging factory conditions</div>
+                        <div className="text-[#8B5CF6] font-semibold">82%</div>
+                        <div className="text-neutral-400 text-sm">Reduction in footage logging time</div>
                       </div>
                       <div className="flex items-center gap-2">
-                        <div className="text-[#8B5CF6] font-semibold">15%</div>
-                        <div className="text-neutral-400 text-sm">Reduction in safety incidents</div>
+                        <div className="text-[#8B5CF6] font-semibold">65%</div>
+                        <div className="text-neutral-400 text-sm">Faster content discovery</div>
                       </div>
                       <div className="flex items-center gap-2">
-                        <div className="text-[#8B5CF6] font-semibold">$4.2M</div>
+                        <div className="text-[#8B5CF6] font-semibold">$3.8M</div>
                         <div className="text-neutral-400 text-sm">Annual operational savings</div>
                       </div>
                     </div>
                   </div>
                   <div className="bg-gradient-to-br from-[#8B5CF6]/20 to-[#0EA5E9]/20 flex items-center justify-center p-8">
-                    <Factory className="h-24 w-24 text-white/20" />
+                    <Tv className="h-24 w-24 text-white/20" />
                   </div>
                 </div>
               </Card>
             </motion.div>
             
-            {/* Case Study 2 */}
+            {/* Case Study 2 - Surveillance */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -322,26 +361,26 @@ const IndustryApplications = () => {
               <Card className="bg-[#1a1a2f]/50 border-[#0EA5E9]/20 shadow-lg backdrop-blur-sm overflow-hidden">
                 <div className="grid md:grid-cols-2">
                   <div className="bg-gradient-to-br from-[#0EA5E9]/20 to-[#D946EF]/20 flex items-center justify-center p-8 order-last md:order-first">
-                    <Building2 className="h-24 w-24 text-white/20" />
+                    <Video className="h-24 w-24 text-white/20" />
                   </div>
                   <div className="p-8">
-                    <div className="inline-block px-3 py-1 text-xs font-medium bg-[#0EA5E9]/20 text-[#0EA5E9] rounded-full mb-4">Retail</div>
-                    <h3 className="text-2xl font-bold mb-4 text-white">Major Retail Chain</h3>
+                    <div className="inline-block px-3 py-1 text-xs font-medium bg-[#0EA5E9]/20 text-[#0EA5E9] rounded-full mb-4">Surveillance</div>
+                    <h3 className="text-2xl font-bold mb-4 text-white">Metropolitan Transit Authority</h3>
                     <p className="text-neutral-300 mb-6">
-                      Deployed our recognition platform across 50+ locations to optimize customer journeys and enhance security.
+                      Implemented our recognition system across 200+ camera networks to enhance security operations and incident response.
                     </p>
                     <div className="space-y-3">
                       <div className="flex items-center gap-2">
-                        <div className="text-[#0EA5E9] font-semibold">23%</div>
-                        <div className="text-neutral-400 text-sm">Increase in conversion rate</div>
+                        <div className="text-[#0EA5E9] font-semibold">94%</div>
+                        <div className="text-neutral-400 text-sm">Identity maintenance across camera networks</div>
                       </div>
                       <div className="flex items-center gap-2">
-                        <div className="text-[#0EA5E9] font-semibold">35%</div>
-                        <div className="text-neutral-400 text-sm">Reduction in shrinkage</div>
+                        <div className="text-[#0EA5E9] font-semibold">76%</div>
+                        <div className="text-neutral-400 text-sm">Faster incident resolution</div>
                       </div>
                       <div className="flex items-center gap-2">
-                        <div className="text-[#0EA5E9] font-semibold">19%</div>
-                        <div className="text-neutral-400 text-sm">Improvement in staff efficiency</div>
+                        <div className="text-[#0EA5E9] font-semibold">24/7</div>
+                        <div className="text-neutral-400 text-sm">Real-time processing with minimal latency</div>
                       </div>
                     </div>
                   </div>
