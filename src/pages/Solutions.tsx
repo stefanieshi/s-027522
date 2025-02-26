@@ -7,6 +7,39 @@ import { ArrowRight, Check } from "lucide-react";
 import { Link } from "react-router-dom";
 
 const Solutions = () => {
+  const challengesList = [
+    {
+      title: "Intra-class vs Inter-class Complexity",
+      description: "Person ReID is an intra-class problem (distinguishing between instances of the same class) which is inherently more difficult than inter-class problems like object detection.",
+      color: "#8B5CF6"
+    },
+    {
+      title: "Appearance Variability",
+      description: "People change appearance across time and cameras (clothing, pose, lighting, viewpoint).",
+      color: "#0EA5E9"
+    },
+    {
+      title: "Occlusion and Partial Views",
+      description: "Often only partial information is available in crowded scenes.",
+      color: "#10B981"
+    },
+    {
+      title: "Camera Variations",
+      description: "Different cameras have different characteristics (resolution, color balance, angle).",
+      color: "#F59E0B"
+    },
+    {
+      title: "Temporal Consistency",
+      description: "Maintaining identity across time requires more than frame-by-frame matching.",
+      color: "#EC4899"
+    },
+    {
+      title: "Scalability",
+      description: "Systems must handle thousands of identities efficiently.",
+      color: "#6366F1"
+    }
+  ];
+
   const solutionsList = [
     {
       title: "Advanced Transformer Architectures",
@@ -114,9 +147,53 @@ const Solutions = () => {
         </div>
       </section>
       
+      {/* Challenges Section */}
+      <section className="py-20 bg-[#0f0f1a]">
+        <div className="container mx-auto px-4">
+          <div className="text-center max-w-3xl mx-auto mb-16">
+            <span className="inline-block px-4 py-1 mb-4 text-sm font-medium bg-[#8B5CF6] text-white rounded-full">
+              THE PROBLEM SPACE
+            </span>
+            <h2 className="text-3xl md:text-4xl font-bold mb-6 text-white">Fundamental Challenges</h2>
+            <p className="text-lg text-gray-300">
+              Person Re-Identification presents unique technical hurdles that we're addressing with innovative approaches.
+            </p>
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {challengesList.map((challenge, index) => (
+              <motion.div
+                key={challenge.title}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: index * 0.1 }}
+              >
+                <Card className="h-full bg-[#1a1a2f]/50 border border-white/10 overflow-hidden hover:shadow-lg transition-all duration-300">
+                  <div className="h-2" style={{ backgroundColor: challenge.color }}></div>
+                  <CardContent className="p-6">
+                    <h3 className="text-xl font-bold mb-3 text-white">{challenge.title}</h3>
+                    <p className="text-gray-300">{challenge.description}</p>
+                  </CardContent>
+                </Card>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+      
       {/* Solutions List Section */}
       <section className="py-20 bg-[#0c0c14]">
         <div className="container mx-auto px-4">
+          <div className="text-center max-w-3xl mx-auto mb-16">
+            <span className="inline-block px-4 py-1 mb-4 text-sm font-medium bg-[#0EA5E9] text-white rounded-full">
+              OUR APPROACH
+            </span>
+            <h2 className="text-3xl md:text-4xl font-bold mb-6 text-white">Proposed Solutions</h2>
+            <p className="text-lg text-gray-300">
+              Our research team is developing cutting-edge approaches to overcome these challenges.
+            </p>
+          </div>
+          
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {solutionsList.map((solution, index) => (
               <motion.div
@@ -125,7 +202,7 @@ const Solutions = () => {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5, delay: index * 0.1 }}
               >
-                <Card className="h-full bg-[#1a1a2f]/50 border border-white/10 overflow-hidden hover:shadow-lg hover:shadow-[${solution.color}]/10 transition-all duration-300">
+                <Card className="h-full bg-[#1a1a2f]/50 border border-white/10 overflow-hidden hover:shadow-lg transition-all duration-300">
                   <div className="h-2" style={{ backgroundColor: solution.color }}></div>
                   <CardContent className="p-6">
                     <h3 className="text-xl font-bold mb-3 text-white">{solution.title}</h3>
@@ -133,12 +210,12 @@ const Solutions = () => {
                     <ul className="space-y-3 mb-6">
                       {solution.details.map((detail, i) => (
                         <li key={i} className="flex items-start gap-2">
-                          <Check className="w-5 h-5 text-[${solution.color}] mt-0.5 flex-shrink-0" />
+                          <Check className="w-5 h-5 mt-0.5 flex-shrink-0" style={{ color: solution.color }} />
                           <span className="text-gray-300">{detail}</span>
                         </li>
                       ))}
                     </ul>
-                    <button className="flex items-center gap-2 text-[${solution.color}] font-medium hover:gap-3 transition-all duration-300">
+                    <button className="flex items-center gap-2 font-medium hover:gap-3 transition-all duration-300" style={{ color: solution.color }}>
                       Learn more <ArrowRight className="w-4 h-4" />
                     </button>
                   </CardContent>
