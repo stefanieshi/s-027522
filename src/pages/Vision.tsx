@@ -1,4 +1,3 @@
-
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
 import { toast } from "sonner";
@@ -177,7 +176,7 @@ const Vision = () => {
               <CardContent className="pt-6 h-full flex flex-col">
                 <div className="mb-4 p-2 bg-[#D946EF]/10 rounded-full w-12 h-12 flex items-center justify-center">
                   <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-[#D946EF]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 4.75 7.5 4.75a12.742 12.742 0 00-3.214 2.056l-2.257-2.257a1.004 1.004 0 00-.707-.293 1.005 1.005 0 00-1.414 1.414l2.257 2.257A12.742 12.742 0 017.5 23.25a12.742 12.742 0 003.214-2.056l2.257 2.257a1.004 1.004 0 001.414.293 1.005 1.005 0 00-.707-1.707l-2.257-2.257A12.742 12.742 0 0116.5 4.75c1.746 0 3.332.727 4.5 1.503m-2.257 2.257a1.005 1.005 0 000 1.414l2.257 2.257a12.742 12.742 0 01-3.214 2.056m0 0a12.742 12.742 0 00-3.214-2.056l-2.257-2.257a1.005 1.005 0 000-1.414l2.257-2.257m0 0a12.742 12.742 0 013.214-2.056 12.742 12.742 0 003.214 2.056l2.257 2.257a1.005 1.005 0 001.414 0l-2.257-2.257m0 0c.727.665 1.503 1.832 1.503 3.25a12.742 12.742 0 01-2.056 3.214l-2.257 2.257a1.005 1.005 0 01-1.414 0l2.257-2.257A12.742 12.742 0 0116.5 18.25c0-1.418-.775-2.585-1.503-3.25m-6.747 .75v-3.25m0 3.25a12.742 12.742 0 003.214 2.056l2.257-2.257a1.005 1.005 0 000-1.414l-2.257-2.257A12.742 12.742 0 017.5 5.5c0 1.418.775 2.585 1.503 3.25" />
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 4.75 7.5 4.75a12.742 12.742 0 00-3.214 2.056l-2.257-2.257a1.004 1.004 0 00-.707-.293 1.005 1.005 0 00-1.414 1.414l2.257 2.257A12.742 12.742 0 017.5 23.25a12.742 12.742 0 003.214-2.056l2.257 2.257a1.004 1.004 0 001.414.293 1.005 1.005 0 00-.707-1.707l-2.257-2.257A12.742 12.742 0 0116.5 4.75c1.746 0 3.332.727 4.5 1.503m-2.257 2.257a1.005 1.005 0 000 1.414l2.257 2.257a12.742 12.742 0 01-3.214 2.056m0 0a12.742 12.742 0 00-3.214-2.056l-2.257-2.257a1.005 1.005 0 000-1.414l2.257-2.257A12.742 12.742 0 017.5 5.5c0 1.418.775 2.585 1.503 3.25a12.742 12.742 0 01-2.056 3.214l-2.257 2.257a1.005 1.005 0 01-1.414 0l-2.257-2.257A12.742 12.742 0 0116.5 18.25c0-1.418-.775-2.585-1.503-3.25m-6.747 .75v-3.25m0 3.25a12.742 12.742 0 003.214 2.056l2.257-2.257a1.005 1.005 0 000-1.414l-2.257-2.257A12.742 12.742 0 017.5 5.5c0 1.418.775 2.585 1.503 3.25" />
                   </svg>
                 </div>
                 <h3 className="text-xl font-semibold mb-3 text-white">Temporal Consistency</h3>
@@ -225,28 +224,12 @@ const Vision = () => {
             </p>
           </motion.div>
           
-          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-8">
+          <div className="max-w-md mx-auto">
             <Card className="bg-[#1a1a2f]/50 border-[#D946EF]/20 shadow-lg hover:shadow-xl transition-all duration-300 h-full hover:-translate-y-1 overflow-hidden backdrop-blur-sm">
               <CardContent className="p-6">
                 <img src="/placeholder.svg" alt="Team Member" className="w-24 h-24 rounded-full mx-auto mb-4" />
-                <h3 className="text-xl font-semibold mb-2 text-white">John Doe</h3>
+                <h3 className="text-xl font-semibold mb-2 text-white">Sebastian Logsdon</h3>
                 <p className="text-neutral-400">CEO</p>
-              </CardContent>
-            </Card>
-
-            <Card className="bg-[#1a1a2f]/50 border-[#D946EF]/20 shadow-lg hover:shadow-xl transition-all duration-300 h-full hover:-translate-y-1 overflow-hidden backdrop-blur-sm">
-              <CardContent className="p-6">
-                <img src="/placeholder.svg" alt="Team Member" className="w-24 h-24 rounded-full mx-auto mb-4" />
-                <h3 className="text-xl font-semibold mb-2 text-white">Jane Smith</h3>
-                <p className="text-neutral-400">CTO</p>
-              </CardContent>
-            </Card>
-
-            <Card className="bg-[#1a1a2f]/50 border-[#D946EF]/20 shadow-lg hover:shadow-xl transition-all duration-300 h-full hover:-translate-y-1 overflow-hidden backdrop-blur-sm">
-              <CardContent className="p-6">
-                <img src="/placeholder.svg" alt="Team Member" className="w-24 h-24 rounded-full mx-auto mb-4" />
-                <h3 className="text-xl font-semibold mb-2 text-white">Mike Johnson</h3>
-                <p className="text-neutral-400">Lead AI Researcher</p>
               </CardContent>
             </Card>
           </div>
