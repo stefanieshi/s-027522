@@ -8,6 +8,7 @@ import Features from "./pages/Features";
 import Vision from "./pages/Vision";
 import IndustryApplications from "./pages/IndustryApplications";
 import FutureDirections from "./pages/FutureDirections";
+import Solutions from "./pages/Solutions";
 
 const queryClient = new QueryClient();
 
@@ -21,6 +22,7 @@ const App = () => (
           <Route path="/" element={<Features />} />
           <Route path="/vision" element={<Vision />} />
           <Route path="/features" element={<Features />} />
+          <Route path="/solutions" element={<Solutions />} />
           <Route path="/industry-applications" element={<IndustryApplications />} />
           <Route path="/future-directions" element={<FutureDirections />} />
         </Routes>

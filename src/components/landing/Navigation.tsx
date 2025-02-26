@@ -19,6 +19,7 @@ const Navigation = () => {
         <div className="hidden md:flex items-center gap-8">
           <Link to="/" className="text-neutral-200 hover:text-white transition-colors font-medium">Home</Link>
           <Link to="/vision" className="text-neutral-200 hover:text-white transition-colors font-medium">Our Vision</Link>
+          <Link to="/solutions" className="text-neutral-200 hover:text-white transition-colors font-medium">Solutions</Link>
           <Link to="/industry-applications" className="text-neutral-200 hover:text-white transition-colors font-medium">Industry Applications</Link>
           <Link to="/future-directions" className="text-neutral-200 hover:text-white transition-colors font-medium">Future Directions</Link>
         </div>
@@ -52,6 +53,7 @@ const Navigation = () => {
           <div className="flex flex-col gap-4">
             <Link to="/" className="text-neutral-200 hover:text-white transition-colors font-medium px-4 py-2 hover:bg-white/10 rounded-lg">Home</Link>
             <Link to="/vision" className="text-neutral-200 hover:text-white transition-colors font-medium px-4 py-2 hover:bg-white/10 rounded-lg">Our Vision</Link>
+            <Link to="/solutions" className="text-neutral-200 hover:text-white transition-colors font-medium px-4 py-2 hover:bg-white/10 rounded-lg">Solutions</Link>
             <Link to="/industry-applications" className="text-neutral-200 hover:text-white transition-colors font-medium px-4 py-2 hover:bg-white/10 rounded-lg">Industry Applications</Link>
             <Link to="/future-directions" className="text-neutral-200 hover:text-white transition-colors font-medium px-4 py-2 hover:bg-white/10 rounded-lg">Future Directions</Link>
             <hr className="border-white/10" />
