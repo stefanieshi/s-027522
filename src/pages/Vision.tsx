@@ -1,3 +1,4 @@
+
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
 import { toast } from "sonner";
@@ -79,6 +80,165 @@ const Vision = () => {
                   </p>
                 </div>
               </div>
+            </div>
+          </motion.div>
+        </div>
+      </section>
+
+      {/* Retrieval vs Recognition Comparison Section */}
+      <section className="container-padding py-20 bg-[#0a0a15]">
+        <div className="max-w-5xl mx-auto">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.3 }}
+            className="text-center mb-16"
+          >
+            <span className="inline-block px-4 py-1 mb-4 text-sm font-medium bg-gradient-to-r from-[#8B5CF6] to-[#0EA5E9] text-white rounded-full shadow-[0_0_15px_rgba(139,92,246,0.3)]">
+              The Paradigm Shift
+            </span>
+            <h2 className="text-3xl md:text-4xl font-bold mb-6 text-white">Retrieval vs. Recognition</h2>
+            <p className="text-lg text-neutral-300 max-w-3xl mx-auto">
+              The difference between these paradigms fundamentally changes how AI systems interact with the world
+            </p>
+          </motion.div>
+          
+          <div className="grid md:grid-cols-2 gap-8 mb-16">
+            {/* Retrieval Card */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.4 }}
+            >
+              <Card className="h-full bg-[#1a1a2f]/50 border-[#0EA5E9]/20 shadow-lg backdrop-blur-sm">
+                <div className="h-2 bg-[#0EA5E9] w-full"></div>
+                <CardContent className="p-8">
+                  <div className="mb-6 p-3 bg-[#0EA5E9]/10 rounded-full w-16 h-16 flex items-center justify-center mx-auto">
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-[#0EA5E9]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                    </svg>
+                  </div>
+                  <h3 className="text-2xl font-bold mb-4 text-white text-center">Retrieval</h3>
+                  
+                  <ul className="space-y-4 text-neutral-300">
+                    <li className="flex items-start gap-3">
+                      <div className="rounded-full bg-[#0EA5E9]/20 p-1 mt-1">
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-[#0EA5E9]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                          <polyline points="20 6 9 17 4 12"></polyline>
+                        </svg>
+                      </div>
+                      <span>Finds exact or similar matches from a database</span>
+                    </li>
+                    <li className="flex items-start gap-3">
+                      <div className="rounded-full bg-[#0EA5E9]/20 p-1 mt-1">
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-[#0EA5E9]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                          <polyline points="20 6 9 17 4 12"></polyline>
+                        </svg>
+                      </div>
+                      <span>Highly dependent on visual similarity</span>
+                    </li>
+                    <li className="flex items-start gap-3">
+                      <div className="rounded-full bg-[#0EA5E9]/20 p-1 mt-1">
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-[#0EA5E9]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                          <polyline points="20 6 9 17 4 12"></polyline>
+                        </svg>
+                      </div>
+                      <span>Struggles with appearance changes (clothing, lighting, age)</span>
+                    </li>
+                    <li className="flex items-start gap-3">
+                      <div className="rounded-full bg-[#0EA5E9]/20 p-1 mt-1">
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-[#0EA5E9]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                          <polyline points="20 6 9 17 4 12"></polyline>
+                        </svg>
+                      </div>
+                      <span>Requires multiple examples for each entity</span>
+                    </li>
+                    <li className="flex items-start gap-3">
+                      <div className="rounded-full bg-[#0EA5E9]/20 p-1 mt-1">
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-[#0EA5E9]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                          <polyline points="20 6 9 17 4 12"></polyline>
+                        </svg>
+                      </div>
+                      <span>Limited by the quality and coverage of the reference database</span>
+                    </li>
+                  </ul>
+                </CardContent>
+              </Card>
+            </motion.div>
+            
+            {/* Recognition Card */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.5 }}
+            >
+              <Card className="h-full bg-[#1a1a2f]/50 border-[#8B5CF6]/20 shadow-lg backdrop-blur-sm">
+                <div className="h-2 bg-[#8B5CF6] w-full"></div>
+                <CardContent className="p-8">
+                  <div className="mb-6 p-3 bg-[#8B5CF6]/10 rounded-full w-16 h-16 flex items-center justify-center mx-auto">
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-[#8B5CF6]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z" />
+                    </svg>
+                  </div>
+                  <h3 className="text-2xl font-bold mb-4 text-white text-center">Recognition</h3>
+                  
+                  <ul className="space-y-4 text-neutral-300">
+                    <li className="flex items-start gap-3">
+                      <div className="rounded-full bg-[#8B5CF6]/20 p-1 mt-1">
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-[#8B5CF6]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                          <polyline points="20 6 9 17 4 12"></polyline>
+                        </svg>
+                      </div>
+                      <span>Understands the invariant essence of each entity</span>
+                    </li>
+                    <li className="flex items-start gap-3">
+                      <div className="rounded-full bg-[#8B5CF6]/20 p-1 mt-1">
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-[#8B5CF6]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                          <polyline points="20 6 9 17 4 12"></polyline>
+                        </svg>
+                      </div>
+                      <span>Maintains identity across diverse contexts and appearance changes</span>
+                    </li>
+                    <li className="flex items-start gap-3">
+                      <div className="rounded-full bg-[#8B5CF6]/20 p-1 mt-1">
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-[#8B5CF6]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                          <polyline points="20 6 9 17 4 12"></polyline>
+                        </svg>
+                      </div>
+                      <span>Works with minimal examples, sometimes even just one</span>
+                    </li>
+                    <li className="flex items-start gap-3">
+                      <div className="rounded-full bg-[#8B5CF6]/20 p-1 mt-1">
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-[#8B5CF6]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                          <polyline points="20 6 9 17 4 12"></polyline>
+                        </svg>
+                      </div>
+                      <span>Adapts to new information and evolving appearances</span>
+                    </li>
+                    <li className="flex items-start gap-3">
+                      <div className="rounded-full bg-[#8B5CF6]/20 p-1 mt-1">
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-[#8B5CF6]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                          <polyline points="20 6 9 17 4 12"></polyline>
+                        </svg>
+                      </div>
+                      <span>Functions more like human perception and cognitive systems</span>
+                    </li>
+                  </ul>
+                </CardContent>
+              </Card>
+            </motion.div>
+          </div>
+          
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.6 }}
+            className="max-w-3xl mx-auto"
+          >
+            <div className="bg-gradient-to-r from-[#1a1a2f]/80 to-[#1a1a2f]/40 p-8 rounded-2xl shadow-lg border border-white/10 backdrop-blur-sm">
+              <p className="text-lg italic text-neutral-200">
+                "The shift from retrieval to recognition is as fundamental as the leap from memory to intelligence. While retrieval systems can find what they've seen before, recognition systems understand what they're seeing, regardless of how it appears."
+              </p>
             </div>
           </motion.div>
         </div>
@@ -176,7 +336,7 @@ const Vision = () => {
               <CardContent className="pt-6 h-full flex flex-col">
                 <div className="mb-4 p-2 bg-[#D946EF]/10 rounded-full w-12 h-12 flex items-center justify-center">
                   <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-[#D946EF]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 4.75 7.5 4.75a12.742 12.742 0 00-3.214 2.056l-2.257-2.257a1.004 1.004 0 00-.707-.293 1.005 1.005 0 00-1.414 1.414l2.257 2.257A12.742 12.742 0 017.5 23.25a12.742 12.742 0 003.214-2.056l2.257 2.257a1.004 1.004 0 001.414.293 1.005 1.005 0 00-.707-1.707l-2.257-2.257A12.742 12.742 0 0116.5 4.75c1.746 0 3.332.727 4.5 1.503m-2.257 2.257a1.005 1.005 0 000 1.414l2.257 2.257a12.742 12.742 0 01-3.214 2.056m0 0a12.742 12.742 0 00-3.214-2.056l-2.257-2.257a1.005 1.005 0 000-1.414l2.257-2.257A12.742 12.742 0 017.5 5.5c0 1.418.775 2.585 1.503 3.25a12.742 12.742 0 01-2.056 3.214l-2.257 2.257a1.005 1.005 0 01-1.414 0l-2.257-2.257A12.742 12.742 0 0116.5 18.25c0-1.418-.775-2.585-1.503-3.25m-6.747 .75v-3.25m0 3.25a12.742 12.742 0 003.214 2.056l2.257-2.257a1.005 1.005 0 000-1.414l-2.257-2.257A12.742 12.742 0 017.5 5.5c0 1.418.775 2.585 1.503 3.25" />
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 4.75 7.5 4.75a12.742 12.742 0 00-3.214 2.056l-2.257-2.257a1.004 1.004 0 00-.707-.293 1.005 1.005 0 00-1.414 1.414l2.257 2.257A12.742 12.742 0 017.5 23.25a12.742 12.742 0 003.214-2.056l2.257 2.257a1.004 1.004 0 001.414.293 1.005 1.005 0 00-.707-1.707l-2.257-2.257A12.742 12.742 0 0016.5 4.75c1.746 0 3.332.727 4.5 1.503m-2.257 2.257a1.005 1.005 0 000 1.414l2.257 2.257a12.742 12.742 0 01-3.214 2.056m0 0a12.742 12.742 0 00-3.214-2.056l-2.257-2.257a1.005 1.005 0 000-1.414l2.257-2.257A12.742 12.742 0 017.5 5.5c0 1.418.775 2.585 1.503 3.25a12.742 12.742 0 01-2.056 3.214l-2.257 2.257a1.005 1.005 0 01-1.414 0l-2.257-2.257A12.742 12.742 0 0016.5 18.25c0-1.418-.775-2.585-1.503-3.25m-6.747 .75v-3.25m0 3.25a12.742 12.742 0 003.214 2.056l2.257-2.257a1.005 1.005 0 000-1.414l-2.257-2.257A12.742 12.742 0 007.5 5.5c0 1.418.775 2.585 1.503 3.25" />
                   </svg>
                 </div>
                 <h3 className="text-xl font-semibold mb-3 text-white">Temporal Consistency</h3>
