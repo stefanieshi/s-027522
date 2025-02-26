@@ -27,15 +27,15 @@
   }
   
   .container-padding {
-    @apply px-6 py-4 md:px-8 lg:px-12;
+    @apply px-6 py-6 md:px-8 md:py-8 lg:px-12 lg:py-10;
   }
 
   .heading-xl {
-    @apply text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight;
+    @apply text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight text-white;
   }
 
   .heading-lg {
-    @apply text-3xl md:text-4xl font-bold tracking-tight;
+    @apply text-3xl md:text-4xl font-bold tracking-tight text-white;
   }
 
   .button-primary {
@@ -57,5 +57,29 @@
   
   .prose h3 {
     @apply text-2xl font-bold mb-4 text-white;
+  }
+  
+  .prose p {
+    @apply text-neutral-200 leading-relaxed mb-6;
+  }
+  
+  .card-title {
+    @apply text-2xl font-semibold mb-3 text-white;
+  }
+  
+  .card-description {
+    @apply text-neutral-300 leading-relaxed;
+  }
+  
+  .section-title {
+    @apply text-3xl md:text-4xl font-bold mb-6 text-white;
+  }
+  
+  .section-subtitle {
+    @apply text-lg text-neutral-200 max-w-3xl mx-auto leading-relaxed;
+  }
+  
+  .highlight-text {
+    @apply text-[#8B5CF6] font-medium;
   }
 }

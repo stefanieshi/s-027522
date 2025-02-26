@@ -14,48 +14,55 @@
   font-size: 3rem;
   line-height: 1.2;
   font-weight: 700;
+  color: #ffffff;
 }
 
 .heading-lg {
   font-size: 2.25rem;
   line-height: 1.2;
   font-weight: 700;
+  color: #ffffff;
 }
 
 .button-primary {
-  background-color: #3b82f6;
+  background-color: #8B5CF6;
   color: white;
   padding: 0.75rem 1.5rem;
   border-radius: 0.5rem;
   font-weight: 500;
   transition: background-color 0.2s;
+  box-shadow: 0 0 15px rgba(139, 92, 246, 0.3);
 }
 
 .button-primary:hover {
-  background-color: #2563eb;
+  background-color: #7C3AED;
+  box-shadow: 0 0 25px rgba(139, 92, 246, 0.5);
 }
 
 .button-secondary {
-  background-color: #f3f4f6;
-  color: #1f2937;
+  background-color: #0EA5E9;
+  color: white;
   padding: 0.75rem 1.5rem;
   border-radius: 0.5rem;
   font-weight: 500;
   transition: background-color 0.2s;
+  box-shadow: 0 0 15px rgba(14, 165, 233, 0.3);
 }
 
 .button-secondary:hover {
-  background-color: #e5e7eb;
+  background-color: #0284C7;
+  box-shadow: 0 0 25px rgba(14, 165, 233, 0.5);
 }
 
 .glass-panel {
-  background-color: rgba(255, 255, 255, 0.8);
-  border: 1px solid rgba(255, 255, 255, 0.3);
+  background-color: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(4px);
 }
 
 /* Add custom prose styling */
 .prose {
-  color: #374151;
+  color: #e5e5e7;
   max-width: 65ch;
   margin: 0 auto;
 }
@@ -63,6 +70,35 @@
 .prose p {
   margin-bottom: 1.5rem;
   line-height: 1.75;
+}
+
+.prose h2 {
+  color: #ffffff;
+  font-weight: 700;
+  margin-bottom: 1.5rem;
+}
+
+.prose h3 {
+  color: #ffffff;
+  font-weight: 600;
+  margin-bottom: 1rem;
+}
+
+.highlight-text {
+  color: #8B5CF6;
+  font-weight: 500;
+}
+
+.card-title {
+  color: #ffffff;
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin-bottom: 0.75rem;
+}
+
+.card-description {
+  color: #bbbbc0;
+  line-height: 1.6;
 }
 
 @media (min-width: 768px) {
