@@ -50,6 +50,71 @@ const Vision = () => {
         </div>
       </section>
       
+      {/* NEW SECTION: Revolution in Agent-Based AI */}
+      <section className="container-padding py-16 bg-gradient-to-r from-primary/5 to-accent-purple/5">
+        <div className="max-w-4xl mx-auto">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.25 }}
+          >
+            <h2 className="text-3xl font-bold mb-8 text-center">Revolution in Agent-Based AI</h2>
+            
+            <div className="bg-white rounded-2xl p-8 shadow-md">
+              <ul className="space-y-5 mb-6">
+                <li className="flex items-start">
+                  <span className="inline-block w-6 h-6 bg-accent-purple text-white rounded-full mr-4 flex-shrink-0 flex items-center justify-center font-bold text-sm">1</span>
+                  <div>
+                    <p className="text-lg font-medium text-neutral-800">Current Limitations</p>
+                    <p className="text-neutral-600">AI agents rely on retrieval of information but struggle with making truly informed predictions of future events beyond simple logical inference.</p>
+                  </div>
+                </li>
+                
+                <li className="flex items-start">
+                  <span className="inline-block w-6 h-6 bg-accent-purple text-white rounded-full mr-4 flex-shrink-0 flex items-center justify-center font-bold text-sm">2</span>
+                  <div>
+                    <p className="text-lg font-medium text-neutral-800">Planning Deficiencies</p>
+                    <p className="text-neutral-600">For planning pipelines that need to be created rapidly and optimized in real-time, the current retrieval paradigm is inadequate for companies and government agencies.</p>
+                  </div>
+                </li>
+                
+                <li className="flex items-start">
+                  <span className="inline-block w-6 h-6 bg-accent-purple text-white rounded-full mr-4 flex-shrink-0 flex items-center justify-center font-bold text-sm">3</span>
+                  <div>
+                    <p className="text-lg font-medium text-neutral-800">Recognition Over Retrieval</p>
+                    <p className="text-neutral-600">We need models and LLM agents that recognize sequences of patterns across time, not just particular static patterns, enabling predictions based on likely outcomes rather than mere similarity.</p>
+                  </div>
+                </li>
+                
+                <li className="flex items-start">
+                  <span className="inline-block w-6 h-6 bg-accent-purple text-white rounded-full mr-4 flex-shrink-0 flex items-center justify-center font-bold text-sm">4</span>
+                  <div>
+                    <p className="text-lg font-medium text-neutral-800">Dynamic Planning Capabilities</p>
+                    <p className="text-neutral-600">This shift enables agents to create complex plans over time and adapt them dynamically in response to new information—similar to how the human brain's anterior cingulate cortex functions.</p>
+                  </div>
+                </li>
+                
+                <li className="flex items-start">
+                  <span className="inline-block w-6 h-6 bg-accent-purple text-white rounded-full mr-4 flex-shrink-0 flex items-center justify-center font-bold text-sm">5</span>
+                  <div>
+                    <p className="text-lg font-medium text-neutral-800">True Objective Function</p>
+                    <p className="text-neutral-600">A real definition of good and bad across time and space requires attention and a true objective function, moving beyond the limitations of naive RAG systems.</p>
+                  </div>
+                </li>
+                
+                <li className="flex items-start">
+                  <span className="inline-block w-6 h-6 bg-accent-purple text-white rounded-full mr-4 flex-shrink-0 flex items-center justify-center font-bold text-sm">6</span>
+                  <div>
+                    <p className="text-lg font-medium text-neutral-800">Beyond Person Re-ID</p>
+                    <p className="text-neutral-600">While our immediate focus is solving person re-identification, our overarching mission is to advance the entire recognition paradigm for agent-based AI systems.</p>
+                  </div>
+                </li>
+              </ul>
+            </div>
+          </motion.div>
+        </div>
+      </section>
+      
       {/* Recognition Benefits Section */}
       <section className="container-padding py-16 bg-neutral-50">
         <div className="max-w-4xl mx-auto">
