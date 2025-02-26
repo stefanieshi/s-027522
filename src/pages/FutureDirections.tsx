@@ -1,6 +1,6 @@
 
 import { motion } from "framer-motion";
-import { Lightbulb, Rocket, Zap, BarChart3, Network, PieChart, Brain, Eye, Video, Database, Clock } from "lucide-react";
+import { Lightbulb, Rocket, Zap, BarChart3, Network, PieChart, Brain, Eye, Video, Database, Clock, Check, ArrowRight } from "lucide-react";
 import { toast } from "sonner";
 import Navigation from "@/components/landing/Navigation";
 import Footer from "@/components/landing/Footer";
@@ -10,6 +10,112 @@ const FutureDirections = () => {
   const handleSubscribeClick = () => {
     toast.success("Thanks for subscribing! You'll receive updates on our technology roadmap.");
   };
+
+  const challengesList = [
+    {
+      title: "Intra-class vs Inter-class Complexity",
+      description: "Person ReID is an intra-class problem (distinguishing between instances of the same class) which is inherently more difficult than inter-class problems like object detection.",
+      color: "#8B5CF6"
+    },
+    {
+      title: "Appearance Variability",
+      description: "People change appearance across time and cameras (clothing, pose, lighting, viewpoint).",
+      color: "#0EA5E9"
+    },
+    {
+      title: "Occlusion and Partial Views",
+      description: "Often only partial information is available in crowded scenes.",
+      color: "#10B981"
+    },
+    {
+      title: "Camera Variations",
+      description: "Different cameras have different characteristics (resolution, color balance, angle).",
+      color: "#F59E0B"
+    },
+    {
+      title: "Temporal Consistency",
+      description: "Maintaining identity across time requires more than frame-by-frame matching.",
+      color: "#EC4899"
+    },
+    {
+      title: "Scalability",
+      description: "Systems must handle thousands of identities efficiently.",
+      color: "#6366F1"
+    }
+  ];
+
+  const solutionsList = [
+    {
+      title: "Advanced Transformer Architectures",
+      description: "Utilizing state-of-the-art vision transformers trained on large datasets to extract robust features.",
+      details: [
+        "Attention mechanisms for appearance-invariant features",
+        "Multi-scale feature fusion for comprehensive representation",
+        "Optimized for high throughput and accuracy"
+      ],
+      color: "#8B5CF6"
+    },
+    {
+      title: "Multi-modal Fusion",
+      description: "Combining appearance, temporal, and contextual information for more reliable identification.",
+      details: [
+        "Integration of visual, spatial, and temporal data",
+        "Weighted feature fusion for optimal performance",
+        "Dynamic adjustment based on confidence scores"
+      ],
+      color: "#0EA5E9"
+    },
+    {
+      title: "Temporal Modeling",
+      description: "Incorporating time as a dimension in the recognition process rather than treating frames independently.",
+      details: [
+        "Sequence modeling for trajectory consistency",
+        "Time-aware feature extraction",
+        "Long-term dependency modeling"
+      ],
+      color: "#10B981"
+    },
+    {
+      title: "Scene Context Integration",
+      description: "Using scene understanding to improve person ReID by constraining the search space.",
+      details: [
+        "Environment-aware recognition algorithms",
+        "Spatial relationship mapping",
+        "Context-based re-ranking of candidates"
+      ],
+      color: "#F59E0B"
+    },
+    {
+      title: "Self-supervised Learning",
+      description: "Leveraging unlabeled data to improve generalization through techniques like DINO grounding.",
+      details: [
+        "Contrastive learning for identity embeddings",
+        "Unsupervised domain adaptation",
+        "Knowledge distillation from large models"
+      ],
+      color: "#EC4899"
+    },
+    {
+      title: "Clustering and Reranking",
+      description: "Clustering similar tracks and reranking them to improve the essential mAP metric.",
+      details: [
+        "Hierarchical clustering for related identities",
+        "Distance metric learning for precise similarity",
+        "Post-processing optimization for improved accuracy"
+      ],
+      color: "#6366F1"
+    },
+    {
+      title: "Hierarchical Recognition",
+      description: "Implementing a multi-stage approach that progressively refines identification.",
+      details: [
+        "Coarse-to-fine identity matching",
+        "Cascaded verification stages",
+        "Confidence-based decision making"
+      ],
+      color: "#14B8A6"
+    }
+  ];
 
   return (
     <div className="min-h-screen bg-[#0a0a0f]">
@@ -66,47 +172,14 @@ const FutureDirections = () => {
               </div>
               
               <div className="space-y-6">
-                <div className="bg-[#1a1a2f]/50 rounded-xl p-6 border border-[#8B5CF6]/20 shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
-                  <h3 className="text-xl font-bold mb-2 text-white">Intra-class vs Inter-class Complexity</h3>
-                  <p className="text-neutral-300">
-                    Person ReID is an intra-class problem (distinguishing between instances of the same class) which is inherently more difficult than inter-class problems like object detection.
-                  </p>
-                </div>
-                
-                <div className="bg-[#1a1a2f]/50 rounded-xl p-6 border border-[#8B5CF6]/20 shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
-                  <h3 className="text-xl font-bold mb-2 text-white">Appearance Variability</h3>
-                  <p className="text-neutral-300">
-                    People change appearance across time and cameras (clothing, pose, lighting, viewpoint).
-                  </p>
-                </div>
-                
-                <div className="bg-[#1a1a2f]/50 rounded-xl p-6 border border-[#8B5CF6]/20 shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
-                  <h3 className="text-xl font-bold mb-2 text-white">Occlusion and Partial Views</h3>
-                  <p className="text-neutral-300">
-                    Often only partial information is available in crowded scenes.
-                  </p>
-                </div>
-                
-                <div className="bg-[#1a1a2f]/50 rounded-xl p-6 border border-[#8B5CF6]/20 shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
-                  <h3 className="text-xl font-bold mb-2 text-white">Camera Variations</h3>
-                  <p className="text-neutral-300">
-                    Different cameras have different characteristics (resolution, color balance, angle).
-                  </p>
-                </div>
-                
-                <div className="bg-[#1a1a2f]/50 rounded-xl p-6 border border-[#8B5CF6]/20 shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
-                  <h3 className="text-xl font-bold mb-2 text-white">Temporal Consistency</h3>
-                  <p className="text-neutral-300">
-                    Maintaining identity across time requires more than frame-by-frame matching.
-                  </p>
-                </div>
-                
-                <div className="bg-[#1a1a2f]/50 rounded-xl p-6 border border-[#8B5CF6]/20 shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
-                  <h3 className="text-xl font-bold mb-2 text-white">Scalability</h3>
-                  <p className="text-neutral-300">
-                    Systems must handle thousands of identities efficiently.
-                  </p>
-                </div>
+                {challengesList.map((challenge, index) => (
+                  <div key={challenge.title} className="bg-[#1a1a2f]/50 rounded-xl p-6 border border-[#8B5CF6]/20 shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
+                    <h3 className="text-xl font-bold mb-2 text-white">{challenge.title}</h3>
+                    <p className="text-neutral-300">
+                      {challenge.description}
+                    </p>
+                  </div>
+                ))}
               </div>
             </motion.div>
             
@@ -127,54 +200,14 @@ const FutureDirections = () => {
               </div>
               
               <div className="space-y-6">
-                <div className="bg-[#1a1a2f]/50 rounded-xl p-6 border border-[#0EA5E9]/20 shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
-                  <h3 className="text-xl font-bold mb-2 text-white">Advanced Transformer Architectures</h3>
-                  <p className="text-neutral-300">
-                    Utilizing state-of-the-art vision transformers trained on large datasets to extract robust features.
-                  </p>
-                </div>
-                
-                <div className="bg-[#1a1a2f]/50 rounded-xl p-6 border border-[#0EA5E9]/20 shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
-                  <h3 className="text-xl font-bold mb-2 text-white">Multi-modal Fusion</h3>
-                  <p className="text-neutral-300">
-                    Combining appearance, temporal, and contextual information for more reliable identification.
-                  </p>
-                </div>
-                
-                <div className="bg-[#1a1a2f]/50 rounded-xl p-6 border border-[#0EA5E9]/20 shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
-                  <h3 className="text-xl font-bold mb-2 text-white">Temporal Modeling</h3>
-                  <p className="text-neutral-300">
-                    Incorporating time as a dimension in the recognition process rather than treating frames independently.
-                  </p>
-                </div>
-                
-                <div className="bg-[#1a1a2f]/50 rounded-xl p-6 border border-[#0EA5E9]/20 shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
-                  <h3 className="text-xl font-bold mb-2 text-white">Scene Context Integration</h3>
-                  <p className="text-neutral-300">
-                    Using scene understanding to improve person ReID by constraining the search space.
-                  </p>
-                </div>
-                
-                <div className="bg-[#1a1a2f]/50 rounded-xl p-6 border border-[#0EA5E9]/20 shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
-                  <h3 className="text-xl font-bold mb-2 text-white">Self-supervised Learning</h3>
-                  <p className="text-neutral-300">
-                    Leveraging unlabeled data to improve generalization through techniques like DINO grounding.
-                  </p>
-                </div>
-                
-                <div className="bg-[#1a1a2f]/50 rounded-xl p-6 border border-[#0EA5E9]/20 shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
-                  <h3 className="text-xl font-bold mb-2 text-white">Clustering and Reranking</h3>
-                  <p className="text-neutral-300">
-                    Clustering similar tracks and reranking them to improve the essential mAP metric.
-                  </p>
-                </div>
-                
-                <div className="bg-[#1a1a2f]/50 rounded-xl p-6 border border-[#0EA5E9]/20 shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
-                  <h3 className="text-xl font-bold mb-2 text-white">Hierarchical Recognition</h3>
-                  <p className="text-neutral-300">
-                    Implementing a multi-stage approach that progressively refines identification.
-                  </p>
-                </div>
+                {solutionsList.map((solution, index) => (
+                  <div key={solution.title} className="bg-[#1a1a2f]/50 rounded-xl p-6 border border-[#0EA5E9]/20 shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
+                    <h3 className="text-xl font-bold mb-2 text-white">{solution.title}</h3>
+                    <p className="text-neutral-300">
+                      {solution.description}
+                    </p>
+                  </div>
+                ))}
               </div>
             </motion.div>
           </div>
