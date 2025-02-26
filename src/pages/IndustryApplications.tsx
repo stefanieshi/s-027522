@@ -70,7 +70,15 @@ const IndustryApplications = () => {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.4 }}
             >
-              <Card className="h-full bg-[#1a1a2f]/50 border-[#0EA5E9]/20 shadow-lg backdrop-blur-sm hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
+              <Card className="h-full bg-[#1a1a2f]/50 border-[#0EA5E9]/20 shadow-lg backdrop-blur-sm hover:shadow-xl transition-all duration-300 hover:-translate-y-1 overflow-hidden">
+                <div className="h-40 relative">
+                  <img 
+                    src="https://images.unsplash.com/photo-1486312338219-ce68d2c6f44d" 
+                    alt="TV Post Production" 
+                    className="w-full h-full object-cover"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-b from-transparent to-[#1a1a2f]"></div>
+                </div>
                 <div className="h-2 bg-[#0EA5E9] w-full"></div>
                 <CardContent className="p-8">
                   <div className="mb-6 p-3 bg-[#0EA5E9]/10 rounded-full w-16 h-16 flex items-center justify-center mx-auto">
@@ -104,7 +112,15 @@ const IndustryApplications = () => {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.5 }}
             >
-              <Card className="h-full bg-[#1a1a2f]/50 border-[#8B5CF6]/20 shadow-lg backdrop-blur-sm hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
+              <Card className="h-full bg-[#1a1a2f]/50 border-[#8B5CF6]/20 shadow-lg backdrop-blur-sm hover:shadow-xl transition-all duration-300 hover:-translate-y-1 overflow-hidden">
+                <div className="h-40 relative">
+                  <img 
+                    src="https://images.unsplash.com/photo-1487058792275-0ad4aaf24ca7" 
+                    alt="Surveillance" 
+                    className="w-full h-full object-cover"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-b from-transparent to-[#1a1a2f]"></div>
+                </div>
                 <div className="h-2 bg-[#8B5CF6] w-full"></div>
                 <CardContent className="p-8">
                   <div className="mb-6 p-3 bg-[#8B5CF6]/10 rounded-full w-16 h-16 flex items-center justify-center mx-auto">
@@ -138,7 +154,15 @@ const IndustryApplications = () => {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.6 }}
             >
-              <Card className="h-full bg-[#1a1a2f]/50 border-[#D946EF]/20 shadow-lg backdrop-blur-sm hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
+              <Card className="h-full bg-[#1a1a2f]/50 border-[#D946EF]/20 shadow-lg backdrop-blur-sm hover:shadow-xl transition-all duration-300 hover:-translate-y-1 overflow-hidden">
+                <div className="h-40 relative">
+                  <img 
+                    src="https://images.unsplash.com/photo-1519389950473-47ba0277781c" 
+                    alt="Government Intelligence" 
+                    className="w-full h-full object-cover"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-b from-transparent to-[#1a1a2f]"></div>
+                </div>
                 <div className="h-2 bg-[#D946EF] w-full"></div>
                 <CardContent className="p-8">
                   <div className="mb-6 p-3 bg-[#D946EF]/10 rounded-full w-16 h-16 flex items-center justify-center mx-auto">
@@ -172,7 +196,15 @@ const IndustryApplications = () => {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.7 }}
             >
-              <Card className="h-full bg-[#1a1a2f]/50 border-[#0EA5E9]/20 shadow-lg backdrop-blur-sm hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
+              <Card className="h-full bg-[#1a1a2f]/50 border-[#0EA5E9]/20 shadow-lg backdrop-blur-sm hover:shadow-xl transition-all duration-300 hover:-translate-y-1 overflow-hidden">
+                <div className="h-40 relative">
+                  <img 
+                    src="https://images.unsplash.com/photo-1498050108023-c5249f4df085" 
+                    alt="Agent-Based AI Frameworks" 
+                    className="w-full h-full object-cover"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-b from-transparent to-[#1a1a2f]"></div>
+                </div>
                 <div className="h-2 bg-[#0EA5E9] w-full"></div>
                 <CardContent className="p-8">
                   <div className="mb-6 p-3 bg-[#0EA5E9]/10 rounded-full w-16 h-16 flex items-center justify-center mx-auto">
