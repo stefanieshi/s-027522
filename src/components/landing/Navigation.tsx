@@ -17,7 +17,7 @@ const Navigation = () => {
         
         {/* Desktop Navigation */}
         <div className="hidden md:flex items-center gap-8">
-          <a href="#features" className="text-neutral-600 hover:text-primary transition-colors font-medium">Features</a>
+          <Link to="/features" className="text-neutral-600 hover:text-primary transition-colors font-medium">Features</Link>
           <a href="#pricing" className="text-neutral-600 hover:text-primary transition-colors font-medium">Pricing</a>
           <Link to="/vision" className="text-neutral-600 hover:text-primary transition-colors font-medium">Our Vision</Link>
         </div>
@@ -49,7 +49,7 @@ const Navigation = () => {
           transition={{ duration: 0.2 }}
         >
           <div className="flex flex-col gap-4">
-            <a href="#features" className="text-neutral-600 hover:text-primary transition-colors font-medium px-4 py-2 hover:bg-neutral-200/50 rounded-lg">Features</a>
+            <Link to="/features" className="text-neutral-600 hover:text-primary transition-colors font-medium px-4 py-2 hover:bg-neutral-200/50 rounded-lg">Features</Link>
             <a href="#pricing" className="text-neutral-600 hover:text-primary transition-colors font-medium px-4 py-2 hover:bg-neutral-200/50 rounded-lg">Pricing</a>
             <Link to="/vision" className="text-neutral-600 hover:text-primary transition-colors font-medium px-4 py-2 hover:bg-neutral-200/50 rounded-lg">Our Vision</Link>
             <hr className="border-neutral-200" />
