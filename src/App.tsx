@@ -7,6 +7,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Features from "./pages/Features";
 import Vision from "./pages/Vision";
 import IndustryApplications from "./pages/IndustryApplications";
+import FutureDirections from "./pages/FutureDirections";
 
 const queryClient = new QueryClient();
 
@@ -21,6 +22,7 @@ const App = () => (
           <Route path="/vision" element={<Vision />} />
           <Route path="/features" element={<Features />} />
           <Route path="/industry-applications" element={<IndustryApplications />} />
+          <Route path="/future-directions" element={<FutureDirections />} />
         </Routes>
       </BrowserRouter>
     </TooltipProvider>

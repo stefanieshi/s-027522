@@ -20,6 +20,7 @@ const Navigation = () => {
           <Link to="/" className="text-neutral-200 hover:text-white transition-colors font-medium">Features</Link>
           <Link to="/vision" className="text-neutral-200 hover:text-white transition-colors font-medium">Our Vision</Link>
           <Link to="/industry-applications" className="text-neutral-200 hover:text-white transition-colors font-medium">Industry Applications</Link>
+          <Link to="/future-directions" className="text-neutral-200 hover:text-white transition-colors font-medium">Future Directions</Link>
         </div>
         
         <div className="hidden md:flex items-center gap-4">
@@ -52,6 +53,7 @@ const Navigation = () => {
             <Link to="/" className="text-neutral-200 hover:text-white transition-colors font-medium px-4 py-2 hover:bg-white/10 rounded-lg">Features</Link>
             <Link to="/vision" className="text-neutral-200 hover:text-white transition-colors font-medium px-4 py-2 hover:bg-white/10 rounded-lg">Our Vision</Link>
             <Link to="/industry-applications" className="text-neutral-200 hover:text-white transition-colors font-medium px-4 py-2 hover:bg-white/10 rounded-lg">Industry Applications</Link>
+            <Link to="/future-directions" className="text-neutral-200 hover:text-white transition-colors font-medium px-4 py-2 hover:bg-white/10 rounded-lg">Future Directions</Link>
             <hr className="border-white/10" />
             <button className="text-neutral-200 hover:text-white transition-colors font-medium px-4 py-2 hover:bg-white/10 rounded-lg text-left">
               Log in
