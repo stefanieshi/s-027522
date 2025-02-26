@@ -13,13 +13,17 @@
   }
 
   body {
-    @apply bg-neutral-100 text-primary font-sans antialiased;
+    @apply bg-[#0a0a0f] text-neutral-100 font-sans antialiased;
+  }
+
+  ::selection {
+    @apply bg-[#8B5CF6] text-white;
   }
 }
 
 @layer components {
   .glass-panel {
-    @apply backdrop-blur-sm bg-white/80 border border-white/20 shadow-lg;
+    @apply backdrop-blur-sm bg-white/5 border border-white/10 shadow-lg;
   }
   
   .container-padding {
@@ -35,23 +39,23 @@
   }
 
   .button-primary {
-    @apply px-6 py-3 bg-primary text-primary-foreground rounded-lg 
-           hover:bg-primary/90 transition-all duration-200
-           font-medium tracking-wide shadow-sm hover:shadow-md;
+    @apply px-6 py-3 bg-[#8B5CF6] text-white rounded-lg 
+           hover:bg-[#7C3AED] transition-all duration-200
+           font-medium tracking-wide shadow-[0_0_15px_rgba(139,92,246,0.3)] hover:shadow-[0_0_25px_rgba(139,92,246,0.5)];
   }
 
   .button-secondary {
-    @apply px-6 py-3 bg-accent-purple text-white rounded-lg 
-           hover:bg-accent-purple/90 transition-all duration-200
-           font-medium tracking-wide shadow-sm hover:shadow-md
+    @apply px-6 py-3 bg-[#0EA5E9] text-white rounded-lg 
+           hover:bg-[#0284C7] transition-all duration-200
+           font-medium tracking-wide shadow-[0_0_15px_rgba(14,165,233,0.3)] hover:shadow-[0_0_25px_rgba(14,165,233,0.5)]
            backdrop-blur-sm border border-white/10;
   }
   
   .prose h2 {
-    @apply text-3xl font-bold mb-6 text-primary;
+    @apply text-3xl font-bold mb-6 text-white;
   }
   
   .prose h3 {
-    @apply text-2xl font-bold mb-4 text-primary;
+    @apply text-2xl font-bold mb-4 text-white;
   }
 }
