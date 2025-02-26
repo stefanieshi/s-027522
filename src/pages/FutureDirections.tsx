@@ -151,69 +151,6 @@ const FutureDirections = () => {
         </div>
       </section>
 
-      {/* Fundamental Challenges & Solutions Section */}
-      <section className="container-padding py-20 bg-[#0f0f1a]">
-        <div className="max-w-6xl mx-auto">
-          <div className="grid lg:grid-cols-2 gap-12 items-start">
-            {/* Fundamental Challenges Column */}
-            <motion.div
-              initial={{ opacity: 0, x: -20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.5, delay: 0.2 }}
-            >
-              <div className="mb-8">
-                <span className="inline-block px-4 py-1 mb-4 text-sm font-medium bg-[#8B5CF6] text-white rounded-full shadow-[0_0_15px_rgba(139,92,246,0.3)]">
-                  The Problem Space
-                </span>
-                <h2 className="text-3xl md:text-4xl font-bold mb-4 text-white">Fundamental Challenges</h2>
-                <p className="text-lg text-neutral-300 leading-relaxed">
-                  Person Re-Identification presents unique technical hurdles that we're addressing with innovative approaches.
-                </p>
-              </div>
-              
-              <div className="space-y-6">
-                {challengesList.map((challenge, index) => (
-                  <div key={challenge.title} className="bg-[#1a1a2f]/50 rounded-xl p-6 border border-[#8B5CF6]/20 shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
-                    <h3 className="text-xl font-bold mb-2 text-white">{challenge.title}</h3>
-                    <p className="text-neutral-300">
-                      {challenge.description}
-                    </p>
-                  </div>
-                ))}
-              </div>
-            </motion.div>
-            
-            {/* Proposed Solutions Column */}
-            <motion.div
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.5, delay: 0.4 }}
-            >
-              <div className="mb-8">
-                <span className="inline-block px-4 py-1 mb-4 text-sm font-medium bg-[#0EA5E9] text-white rounded-full shadow-[0_0_15px_rgba(14,165,233,0.3)]">
-                  Our Approach
-                </span>
-                <h2 className="text-3xl md:text-4xl font-bold mb-4 text-white">Proposed Solutions</h2>
-                <p className="text-lg text-neutral-300 leading-relaxed">
-                  Our research team is developing cutting-edge approaches to overcome these challenges.
-                </p>
-              </div>
-              
-              <div className="space-y-6">
-                {solutionsList.map((solution, index) => (
-                  <div key={solution.title} className="bg-[#1a1a2f]/50 rounded-xl p-6 border border-[#0EA5E9]/20 shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
-                    <h3 className="text-xl font-bold mb-2 text-white">{solution.title}</h3>
-                    <p className="text-neutral-300">
-                      {solution.description}
-                    </p>
-                  </div>
-                ))}
-              </div>
-            </motion.div>
-          </div>
-        </div>
-      </section>
-
       {/* Local Vision LLMs Section */}
       <section className="container-padding py-20 bg-[#0a0a15]">
         <div className="max-w-6xl mx-auto">
