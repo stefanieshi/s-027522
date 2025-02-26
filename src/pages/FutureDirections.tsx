@@ -1,6 +1,6 @@
 
 import { motion } from "framer-motion";
-import { Lightbulb, Rocket, Zap, BarChart3, Network, PieChart, Brain } from "lucide-react";
+import { Lightbulb, Rocket, Zap, BarChart3, Network, PieChart, Brain, Eye, Video, Database, Clock } from "lucide-react";
 import { toast } from "sonner";
 import Navigation from "@/components/landing/Navigation";
 import Footer from "@/components/landing/Footer";
@@ -42,6 +42,316 @@ const FutureDirections = () => {
               Exploring the next frontiers of recognition technology and the transformative potential for industries worldwide.
             </p>
           </motion.div>
+        </div>
+      </section>
+
+      {/* Local Vision LLMs Section */}
+      <section className="container-padding py-20 bg-[#0f0f1a]">
+        <div className="max-w-6xl mx-auto">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.3 }}
+            className="text-center mb-16"
+          >
+            <span className="inline-block px-4 py-1 mb-4 text-sm font-medium bg-[#0EA5E9] text-white rounded-full shadow-[0_0_15px_rgba(14,165,233,0.3)]">
+              Next-Gen Vision Systems
+            </span>
+            <h2 className="text-3xl md:text-4xl font-bold mb-6 text-white">Leveraging Local Vision LLMs</h2>
+            <p className="text-lg text-neutral-300 max-w-3xl mx-auto">
+              Exploring non-API-based vision language models like LLAVA for advanced scene analysis
+            </p>
+          </motion.div>
+          
+          <div className="grid md:grid-cols-2 gap-8 items-center mb-16">
+            <motion.div
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.5, delay: 0.4 }}
+            >
+              <div className="h-48 md:h-80 relative rounded-xl overflow-hidden">
+                <img 
+                  src="https://images.unsplash.com/photo-1620712943543-bcc4688e7485" 
+                  alt="AI Vision Analysis" 
+                  className="w-full h-full object-cover"
+                />
+                <div className="absolute inset-0 bg-gradient-to-r from-[#0a0a1a]/80 via-transparent to-transparent"></div>
+              </div>
+            </motion.div>
+            
+            <motion.div
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.5, delay: 0.4 }}
+            >
+              <p className="text-neutral-300 leading-relaxed mb-6">
+                We aim to explore the use of local, non-API-based vision LLMs like LLAVA for scene analysis. This approach eliminates the need for constant cloud connectivity while maintaining powerful analytical capabilities.
+              </p>
+              
+              <div className="space-y-6">
+                <div className="bg-white/5 p-5 rounded-xl border border-white/10">
+                  <h3 className="text-xl font-bold mb-3 text-white flex items-center">
+                    <Video className="h-5 w-5 mr-3 text-[#0EA5E9]" />
+                    Dynamic Scenes
+                  </h3>
+                  <p className="text-neutral-300">
+                    For moving cameras or edited footage, snapshots can be captured intermittently during scene transitions, providing key contextual frames for analysis.
+                  </p>
+                </div>
+                
+                <div className="bg-white/5 p-5 rounded-xl border border-white/10">
+                  <h3 className="text-xl font-bold mb-3 text-white flex items-center">
+                    <Eye className="h-5 w-5 mr-3 text-[#0EA5E9]" />
+                    Static Scenes
+                  </h3>
+                  <p className="text-neutral-300">
+                    For fixed security cameras, the focus will be on recording "salient events" in real-time, determined by the vision LLM. This process can be enhanced with open-set models that trigger snapshots based on specific thresholds.
+                  </p>
+                </div>
+              </div>
+            </motion.div>
+          </div>
+          
+          <div className="grid md:grid-cols-2 gap-8">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.5 }}
+            >
+              <Card className="h-full bg-[#1a1a2f]/50 border-[#8B5CF6]/20 shadow-lg backdrop-blur-sm hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
+                <div className="h-2 bg-[#8B5CF6] w-full"></div>
+                <CardContent className="p-8">
+                  <div className="mb-6 p-3 bg-[#8B5CF6]/10 rounded-full w-16 h-16 flex items-center justify-center mx-auto">
+                    <Database className="h-8 w-8 text-[#8B5CF6]" />
+                  </div>
+                  <h3 className="text-2xl font-bold mb-4 text-white text-center">Searchable Video Indexing</h3>
+                  
+                  <div className="space-y-4 text-neutral-300">
+                    <p className="leading-relaxed">
+                      This approach enables natural language queries across vast video datasets, allowing users to find people, objects, and events without traditional tagging systems.
+                    </p>
+                    
+                    <div className="bg-gradient-to-r from-[#8B5CF6]/10 to-transparent border-l-4 border-[#8B5CF6] rounded-r-xl p-4 mt-6">
+                      <h4 className="font-semibold text-white mb-2">Key Advantages</h4>
+                      <ul className="list-disc pl-5 space-y-2">
+                        <li>Semantic understanding of video content</li>
+                        <li>Natural language search capabilities</li>
+                        <li>Contextual awareness of objects and actions</li>
+                        <li>Minimal manual tagging required</li>
+                      </ul>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </motion.div>
+            
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.6 }}
+            >
+              <Card className="h-full bg-[#1a1a2f]/50 border-[#0EA5E9]/20 shadow-lg backdrop-blur-sm hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
+                <div className="h-2 bg-[#0EA5E9] w-full"></div>
+                <CardContent className="p-8">
+                  <div className="mb-6 p-3 bg-[#0EA5E9]/10 rounded-full w-16 h-16 flex items-center justify-center mx-auto">
+                    <Eye className="h-8 w-8 text-[#0EA5E9]" />
+                  </div>
+                  <h3 className="text-2xl font-bold mb-4 text-white text-center">Security Applications</h3>
+                  
+                  <div className="space-y-4 text-neutral-300">
+                    <p className="leading-relaxed">
+                      These technologies offer lightweight, local solutions for security companies, potentially disrupting the market with cost-effective alternatives to cloud-based systems.
+                    </p>
+                    
+                    <div className="bg-gradient-to-r from-[#0EA5E9]/10 to-transparent border-l-4 border-[#0EA5E9] rounded-r-xl p-4 mt-6">
+                      <h4 className="font-semibold text-white mb-2">Market Impact</h4>
+                      <ul className="list-disc pl-5 space-y-2">
+                        <li>Reduced dependency on cloud infrastructure</li>
+                        <li>Lower operational costs for security providers</li>
+                        <li>Enhanced privacy through local processing</li>
+                        <li>Faster response time for critical events</li>
+                      </ul>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </motion.div>
+          </div>
+        </div>
+      </section>
+
+      {/* Key Research Areas Section */}
+      <section className="container-padding py-20 bg-[#0a0a15]">
+        <div className="max-w-5xl mx-auto">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.3 }}
+            className="text-center mb-16"
+          >
+            <span className="inline-block px-4 py-1 mb-4 text-sm font-medium bg-[#D946EF] text-white rounded-full shadow-[0_0_15px_rgba(217,70,239,0.3)]">
+              Research Focus
+            </span>
+            <h2 className="text-3xl md:text-4xl font-bold mb-6 text-white">Key Research Areas</h2>
+            <p className="text-lg text-neutral-300 max-w-3xl mx-auto">
+              Our team is focused on these critical research challenges to make local vision LLMs viable for real-world applications
+            </p>
+          </motion.div>
+          
+          <div className="space-y-8">
+            {/* Speed and Latency */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.4 }}
+            >
+              <Card className="bg-[#1a1a2f]/50 border-[#8B5CF6]/20 shadow-lg backdrop-blur-sm overflow-hidden">
+                <div className="grid md:grid-cols-2 gap-6 p-8">
+                  <div>
+                    <div className="inline-block px-3 py-1 text-xs font-medium bg-[#8B5CF6]/20 text-[#8B5CF6] rounded-full mb-4">Research Challenge 1</div>
+                    <h3 className="text-2xl font-bold mb-4 text-white flex items-center">
+                      <Clock className="mr-2 h-6 w-6 text-[#8B5CF6]" />
+                      Speed and Latency
+                    </h3>
+                    <p className="text-neutral-300 mb-6">
+                      We're investigating whether local vision LLMs like LLAVA can operate efficiently in real-time scenarios while maintaining high performance.
+                    </p>
+                    
+                    <div className="space-y-3 mt-4">
+                      <div className="bg-white/5 p-4 rounded-lg">
+                        <h4 className="text-white font-medium mb-2">Performance Metrics</h4>
+                        <ul className="list-disc pl-5 text-neutral-300 space-y-1">
+                          <li>Processing speed per frame with MPS optimization</li>
+                          <li>Performance on A100 and H100 GPUs</li>
+                          <li>Benchmarking over an hour of edited footage</li>
+                        </ul>
+                      </div>
+                      
+                      <div className="bg-white/5 p-4 rounded-lg">
+                        <h4 className="text-white font-medium mb-2">Snapshot Frequency Optimization</h4>
+                        <p className="text-neutral-300">
+                          Finding the optimal balance between sparse snapshots for speed and dense coverage for detail capture in high-pressure scenarios.
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div className="flex items-center justify-center">
+                    <div className="relative w-full h-64 rounded-xl overflow-hidden">
+                      <img 
+                        src="https://images.unsplash.com/photo-1558346490-a72e53ae2d4f" 
+                        alt="Speed and Latency Research" 
+                        className="w-full h-full object-cover"
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-b from-transparent to-[#1a1a2f]/80"></div>
+                    </div>
+                  </div>
+                </div>
+              </Card>
+            </motion.div>
+            
+            {/* Data Model Compliance */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.5 }}
+            >
+              <Card className="bg-[#1a1a2f]/50 border-[#0EA5E9]/20 shadow-lg backdrop-blur-sm overflow-hidden">
+                <div className="grid md:grid-cols-2 gap-6 p-8">
+                  <div className="flex items-center justify-center order-last md:order-first">
+                    <div className="relative w-full h-64 rounded-xl overflow-hidden">
+                      <img 
+                        src="https://images.unsplash.com/photo-1542903660-eedba2cda473" 
+                        alt="Data Model Research" 
+                        className="w-full h-full object-cover"
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-b from-transparent to-[#1a1a2f]/80"></div>
+                    </div>
+                  </div>
+                  
+                  <div>
+                    <div className="inline-block px-3 py-1 text-xs font-medium bg-[#0EA5E9]/20 text-[#0EA5E9] rounded-full mb-4">Research Challenge 2</div>
+                    <h3 className="text-2xl font-bold mb-4 text-white flex items-center">
+                      <Database className="mr-2 h-6 w-6 text-[#0EA5E9]" />
+                      Data Model Compliance
+                    </h3>
+                    <p className="text-neutral-300 mb-6">
+                      Our research explores whether LLAVA can condense its detailed responses into structured outputs that conform to specific data models.
+                    </p>
+                    
+                    <div className="space-y-3 mt-4">
+                      <div className="bg-white/5 p-4 rounded-lg">
+                        <h4 className="text-white font-medium mb-2">Structured Output Development</h4>
+                        <p className="text-neutral-300">
+                          Converting complex analyses into concise formats:
+                        </p>
+                        <ul className="list-disc pl-5 text-neutral-300 mt-2 space-y-1">
+                          <li>3-word summaries of scene content</li>
+                          <li>Single-word classifications based on predefined Enum values</li>
+                        </ul>
+                      </div>
+                      
+                      <div className="bg-white/5 p-4 rounded-lg">
+                        <h4 className="text-white font-medium mb-2">Hybrid Approach Benefits</h4>
+                        <p className="text-neutral-300">
+                          This combines LLAVA's generality with the determinism of custom deep learning models, offering both flexibility and reliability.
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </Card>
+            </motion.div>
+            
+            {/* Person Re-Identification */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.6 }}
+            >
+              <Card className="bg-[#1a1a2f]/50 border-[#D946EF]/20 shadow-lg backdrop-blur-sm overflow-hidden">
+                <div className="grid md:grid-cols-2 gap-6 p-8">
+                  <div>
+                    <div className="inline-block px-3 py-1 text-xs font-medium bg-[#D946EF]/20 text-[#D946EF] rounded-full mb-4">Research Challenge 3</div>
+                    <h3 className="text-2xl font-bold mb-4 text-white flex items-center">
+                      <Eye className="mr-2 h-6 w-6 text-[#D946EF]" />
+                      Enhancing Person Re-Identification
+                    </h3>
+                    <p className="text-neutral-300 mb-6">
+                      While not essential, LLAVA could assist in narrowing predictions for Person ReID by leveraging its rich contextual understanding and metadata capabilities.
+                    </p>
+                    
+                    <div className="space-y-3 mt-4">
+                      <div className="bg-white/5 p-4 rounded-lg">
+                        <h4 className="text-white font-medium mb-2">Constraint-Based Identification</h4>
+                        <p className="text-neutral-300">
+                          Isolating who an individual cannot be, improving the mean Average Precision (mAP) metric through elimination rather than direct matching.
+                        </p>
+                      </div>
+                      
+                      <div className="bg-white/5 p-4 rounded-lg">
+                        <h4 className="text-white font-medium mb-2">Appearance Change Handling</h4>
+                        <p className="text-neutral-300">
+                          Addressing challenges like appearance changes across time in TV shows or long-term CCTV footage through contextual understanding.
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div className="flex items-center justify-center">
+                    <div className="relative w-full h-64 rounded-xl overflow-hidden">
+                      <img 
+                        src="https://images.unsplash.com/photo-1639762681485-074b7f938ba0" 
+                        alt="Person Re-Identification Research" 
+                        className="w-full h-full object-cover"
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-b from-transparent to-[#1a1a2f]/80"></div>
+                    </div>
+                  </div>
+                </div>
+              </Card>
+            </motion.div>
+          </div>
         </div>
       </section>
 
@@ -205,115 +515,8 @@ const FutureDirections = () => {
         </div>
       </section>
 
-      {/* Research Focus Section */}
-      <section className="container-padding py-20 bg-[#0a0a15]">
-        <div className="max-w-5xl mx-auto">
-          <div className="grid md:grid-cols-2 gap-12 items-center">
-            <motion.div
-              initial={{ opacity: 0, x: -20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.5, delay: 0.3 }}
-            >
-              <span className="inline-block px-4 py-1 mb-4 text-sm font-medium bg-[#8B5CF6] text-white rounded-full shadow-[0_0_15px_rgba(139,92,246,0.3)]">
-                Research Initiatives
-              </span>
-              <h2 className="text-3xl md:text-4xl font-bold mb-6 text-white">Key Research Areas</h2>
-              <p className="text-lg text-neutral-300 mb-6 leading-relaxed">
-                Our research and development team is focused on these breakthrough capabilities that will define the next generation of recognition technology.
-              </p>
-              
-              <div className="space-y-4">
-                <div className="flex items-start gap-3">
-                  <div className="rounded-full bg-[#8B5CF6]/20 p-2 mt-1">
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-[#8B5CF6]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                      <polyline points="20 6 9 17 4 12"></polyline>
-                    </svg>
-                  </div>
-                  <div>
-                    <h3 className="text-white font-medium mb-1">Few-Shot Learning</h3>
-                    <p className="text-neutral-400">Recognition from minimal training examples</p>
-                  </div>
-                </div>
-                
-                <div className="flex items-start gap-3">
-                  <div className="rounded-full bg-[#8B5CF6]/20 p-2 mt-1">
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-[#8B5CF6]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                      <polyline points="20 6 9 17 4 12"></polyline>
-                    </svg>
-                  </div>
-                  <div>
-                    <h3 className="text-white font-medium mb-1">Explainable AI</h3>
-                    <p className="text-neutral-400">Transparent decision-making processes that build trust</p>
-                  </div>
-                </div>
-                
-                <div className="flex items-start gap-3">
-                  <div className="rounded-full bg-[#8B5CF6]/20 p-2 mt-1">
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-[#8B5CF6]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                      <polyline points="20 6 9 17 4 12"></polyline>
-                    </svg>
-                  </div>
-                  <div>
-                    <h3 className="text-white font-medium mb-1">Privacy-Preserving Techniques</h3>
-                    <p className="text-neutral-400">Recognition without compromising personal data</p>
-                  </div>
-                </div>
-                
-                <div className="flex items-start gap-3">
-                  <div className="rounded-full bg-[#8B5CF6]/20 p-2 mt-1">
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-[#8B5CF6]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                      <polyline points="20 6 9 17 4 12"></polyline>
-                    </svg>
-                  </div>
-                  <div>
-                    <h3 className="text-white font-medium mb-1">Adversarial Defense</h3>
-                    <p className="text-neutral-400">Robust systems resistant to manipulation attempts</p>
-                  </div>
-                </div>
-              </div>
-            </motion.div>
-            
-            <motion.div
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.5, delay: 0.4 }}
-              className="relative"
-            >
-              <div className="absolute -inset-4 bg-gradient-to-r from-[#0EA5E9]/20 via-[#8B5CF6]/20 to-[#D946EF]/20 blur-lg opacity-70 rounded-2xl"></div>
-              <div className="glass-panel rounded-xl p-6 relative">
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="bg-white/5 rounded-lg p-5 backdrop-blur-sm border border-white/10">
-                    <BarChart3 className="h-8 w-8 text-[#0EA5E9] mb-3" />
-                    <h3 className="text-white font-medium mb-2">Performance Metrics</h3>
-                    <p className="text-sm text-neutral-400">85% higher accuracy in low-light conditions</p>
-                  </div>
-                  
-                  <div className="bg-white/5 rounded-lg p-5 backdrop-blur-sm border border-white/10">
-                    <Rocket className="h-8 w-8 text-[#8B5CF6] mb-3" />
-                    <h3 className="text-white font-medium mb-2">Speed Improvements</h3>
-                    <p className="text-sm text-neutral-400">70% faster processing with lower power</p>
-                  </div>
-                  
-                  <div className="bg-white/5 rounded-lg p-5 backdrop-blur-sm border border-white/10">
-                    <PieChart className="h-8 w-8 text-[#D946EF] mb-3" />
-                    <h3 className="text-white font-medium mb-2">Model Size</h3>
-                    <p className="text-sm text-neutral-400">3-10x smaller models with equivalent accuracy</p>
-                  </div>
-                  
-                  <div className="bg-white/5 rounded-lg p-5 backdrop-blur-sm border border-white/10">
-                    <Lightbulb className="h-8 w-8 text-[#0EA5E9] mb-3" />
-                    <h3 className="text-white font-medium mb-2">Research Impact</h3>
-                    <p className="text-sm text-neutral-400">12 peer-reviewed publications in 2023</p>
-                  </div>
-                </div>
-              </div>
-            </motion.div>
-          </div>
-        </div>
-      </section>
-
       {/* Future Applications Section */}
-      <section className="container-padding py-20 bg-[#0f0f1a]">
+      <section className="container-padding py-20 bg-[#0a0a15]">
         <div className="max-w-5xl mx-auto">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
