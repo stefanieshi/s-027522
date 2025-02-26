@@ -46,7 +46,7 @@ const FutureDirections = () => {
       </section>
 
       {/* Local Vision LLMs Section */}
-      <section className="container-padding py-20 bg-[#0a0a15]">
+      <section className="container-padding py-20 bg-[#0f0f1a]">
         <div className="max-w-6xl mx-auto">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -181,7 +181,7 @@ const FutureDirections = () => {
       </section>
 
       {/* Key Research Areas Section */}
-      <section className="container-padding py-20 bg-[#0f0f1a]">
+      <section className="container-padding py-20 bg-[#0a0a15]">
         <div className="max-w-5xl mx-auto">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -356,7 +356,7 @@ const FutureDirections = () => {
       </section>
 
       {/* Technology Roadmap Section */}
-      <section className="container-padding py-20 bg-[#0a0a15]">
+      <section className="container-padding py-20 bg-[#0f0f1a]">
         <div className="max-w-6xl mx-auto">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -516,7 +516,7 @@ const FutureDirections = () => {
       </section>
 
       {/* Future Applications Section */}
-      <section className="container-padding py-20 bg-[#0f0f1a]">
+      <section className="container-padding py-20 bg-[#0a0a15]">
         <div className="max-w-5xl mx-auto">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
