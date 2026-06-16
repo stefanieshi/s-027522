@@ -2,8 +2,9 @@ import { useState } from "react";
 import TopBar from "../components/TopBar";
 import { useData, useUi } from "../store";
 import { PLAT_LABEL } from "../lib/constants";
-import { initial, xDmUrl } from "../lib/utils";
+import { initial } from "../lib/utils";
 import { generateReply } from "../lib/llm";
+import { sendInboxReply } from "../lib/actions";
 import { InboxAddModal } from "../components/modals";
 import type { InboxItem } from "../lib/types";
 
@@ -143,14 +144,7 @@ function IbCard({ m }: { m: InboxItem }) {
   }
 
   function send() {
-    navigator.clipboard?.writeText(m.reply);
-    const url = m.platform === "x" ? xDmUrl(m.reply) : "";
-    if (url) window.open(url, "_blank");
-    setData((d) => {
-      const t = d.inbox.find((x) => x.id === m.id);
-      if (t) t.status = "sent";
-    });
-    toast(url ? "已打开 X 发送框 · 按发送即可" : "回复已复制 · 去平台粘贴发送");
+    void sendInboxReply(m);
   }
 
   function ignore() {

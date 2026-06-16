@@ -18,6 +18,7 @@ export function AccountModal({ id }: { id?: string }) {
   const [stance, setStance] = useState(e.persona.stance);
   const [taboo, setTaboo] = useState(e.persona.taboo);
   const [format, setFormat] = useState(e.persona.format);
+  const [externalId, setExternalId] = useState(e.externalId || "");
 
   function save() {
     if (!handle.trim()) {
@@ -26,15 +27,17 @@ export function AccountModal({ id }: { id?: string }) {
     }
     setData((d) => {
       const persona = { voice, stance, taboo, format };
+      const ext = externalId.trim() || undefined;
       if (id) {
         const t = d.accounts.find((a) => a.id === id);
         if (t) {
           t.handle = handle.trim();
           t.platform = platform;
           t.persona = persona;
+          t.externalId = ext;
         }
       } else {
-        d.accounts.push({ id: uid(), handle: handle.trim(), platform, color: AV[accountsLen % AV.length], persona });
+        d.accounts.push({ id: uid(), handle: handle.trim(), platform, color: AV[accountsLen % AV.length], persona, externalId: ext });
       }
     });
     closeModal();
@@ -75,6 +78,10 @@ export function AccountModal({ id }: { id?: string }) {
       <label className="fld">
         <span className="lab">格式</span>
         <input className="in" value={format} onChange={(ev) => setFormat(ev.target.value)} />
+      </label>
+      <label className="fld">
+        <span className="lab">外部账号 ID(选填 · zernio account_id / morelogin profile)</span>
+        <input className="in" value={externalId} placeholder="真发布时用;留空则仅 manual" onChange={(ev) => setExternalId(ev.target.value)} />
       </label>
       <div className="mfoot">
         <button className="btn ghost" onClick={closeModal}>

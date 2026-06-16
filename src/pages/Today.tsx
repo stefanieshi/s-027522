@@ -5,6 +5,7 @@ import { DEFAULT_TYPE, PLAT_LABEL, PLAT_TIME, TYPES } from "../lib/constants";
 import { composerUrl, fmtTime, initial, isToday } from "../lib/utils";
 import { generateDraft } from "../lib/llm";
 import { assignSchedule, recomputeSim } from "../lib/schedule";
+import { publishDraftNow, scheduleDraftBackend } from "../lib/actions";
 import type { Account, Draft, Platform, ResultTier } from "../lib/types";
 
 function isTodayish(d: Draft) {
@@ -57,19 +58,20 @@ export default function Today() {
   }
 
   function approvePlat(p: Platform) {
-    let n = 0;
+    const approvedIds: string[] = [];
     setData((d) => {
       d.drafts
         .filter((x) => x.platform === p && x.status === "pending" && !((x.sim?.score || 0) >= d.settings.simThreshold || x.disclosure_required))
         .forEach((x) => {
           x.status = "approved";
           assignSchedule(x, d.drafts, d.settings);
-          n++;
+          approvedIds.push(x.id);
         });
     });
     setExpanded(p, true);
     const leftover = useData.getState().data.drafts.some((x) => x.platform === p && x.status === "pending");
-    toast(`已批准 ${n} 条` + (leftover ? "(带旗标的留你手动处理)" : ""));
+    toast(`已批准 ${approvedIds.length} 条` + (leftover ? "(带旗标的留你手动处理)" : ""));
+    approvedIds.forEach((id) => void scheduleDraftBackend(id));
   }
 
   if (!data.accounts.length) {
@@ -324,6 +326,7 @@ function DraftCard({ d, acctOf }: { d: Draft; acctOf: (id: string) => Account | 
     setExpanded(d.platform, true);
     const t = useData.getState().data.drafts.find((x) => x.id === d.id);
     toast(d.type === "x_post" && t?.scheduledAt ? "已批准 · 排期 " + fmtTime(t.scheduledAt) : "已批准");
+    void scheduleDraftBackend(d.id);
   }
 
   function reject() {
@@ -375,11 +378,14 @@ function DraftCard({ d, acctOf }: { d: Draft; acctOf: (id: string) => Account | 
 }
 
 function SendRow({ d, acctOf }: { d: Draft; acctOf: (id: string) => Account | undefined }) {
-  const setData = useData((s) => s.setData);
-  const { toast, setExpanded } = useUi();
+  const toast = useUi((s) => s.toast);
+  const setExpanded = useUi((s) => s.setExpanded);
+  const useBackend = useData((s) => s.data.settings.useBackend);
+  const channel = useData((s) => s.data.settings.channel);
   const a = acctOf(d.account_id) || ({ handle: "?" } as Account);
   const now = Date.now();
   const ready = !d.scheduledAt || now >= d.scheduledAt;
+  const [publishing, setPublishing] = useState(false);
 
   function copyText() {
     navigator.clipboard?.writeText([d.hook, d.body, d.cta].filter(Boolean).join("\n")).then(
@@ -387,17 +393,13 @@ function SendRow({ d, acctOf }: { d: Draft; acctOf: (id: string) => Account | un
       () => toast("复制失败")
     );
   }
-  function publish() {
-    setData((dd) => {
-      const t = dd.drafts.find((x) => x.id === d.id);
-      if (t) {
-        t.status = "published";
-        t.publishedAt = Date.now();
-      }
-    });
+  async function publish() {
+    setPublishing(true);
+    await publishDraftNow(d.id);
     setExpanded(d.platform, true);
-    toast("已标记发布 · 记得真的发出去 🙂");
+    setPublishing(false);
   }
+  const sendLabel = useBackend && channel !== "manual" ? "通过 " + channel + " 发布" : "标记已发";
 
   return (
     <div className="swrow" style={{ alignItems: "center" }}>
@@ -423,8 +425,8 @@ function SendRow({ d, acctOf }: { d: Draft; acctOf: (id: string) => Account | un
         <a className="btn ghost sm" href={composerUrl[d.platform]} target="_blank" rel="noreferrer" style={{ textDecoration: "none" }}>
           打开 {PLAT_LABEL[d.platform]}
         </a>
-        <button className="btn sm" onClick={publish} disabled={!ready}>
-          标记已发
+        <button className="btn sm" onClick={publish} disabled={!ready || publishing}>
+          {publishing ? <span className="spin" /> : sendLabel}
         </button>
       </div>
     </div>

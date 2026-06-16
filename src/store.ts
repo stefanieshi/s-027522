@@ -26,6 +26,9 @@ function freshState(): AppData {
       minGapMin: 45,
       dailyPerAccount: 2,
       autoReply: true,
+      useBackend: false,
+      apiBase: "http://localhost:8787",
+      channel: "manual",
     },
   };
 }
@@ -83,6 +86,21 @@ export const useData = create<DataStore>()(
     {
       name: DB_KEY,
       partialize: (s) => ({ data: s.data }),
+      // backfill any keys added in later versions onto older saves
+      merge: (persisted, current) => {
+        const p = persisted as { data?: Partial<AppData> } | undefined;
+        if (!p?.data) return current;
+        const base = freshState();
+        return {
+          ...current,
+          data: {
+            ...base,
+            ...p.data,
+            templates: { ...base.templates, ...p.data.templates },
+            settings: { ...base.settings, ...p.data.settings },
+          },
+        };
+      },
       // migrate the legacy single-file prototype save if present
       onRehydrateStorage: () => () => {
         try {
