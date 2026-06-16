@@ -1,34 +1,35 @@
+import Sidebar from "./components/Sidebar";
+import Toast from "./components/Toast";
+import Modal from "./components/Modal";
+import Today from "./pages/Today";
+import Calendar from "./pages/Calendar";
+import Inbox from "./pages/Inbox";
+import Analytics from "./pages/Analytics";
+import Voice from "./pages/Voice";
+import Settings from "./pages/Settings";
+import { useUi } from "./store";
+import type { ViewId } from "./lib/types";
 
-import { Toaster } from "@/components/ui/toaster";
-import { Toaster as Sonner } from "@/components/ui/sonner";
-import { TooltipProvider } from "@/components/ui/tooltip";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
-import Features from "./pages/Features";
-import Vision from "./pages/Vision";
-import IndustryApplications from "./pages/IndustryApplications";
-import FutureDirections from "./pages/FutureDirections";
-import Solutions from "./pages/Solutions";
+const PAGES: Record<ViewId, () => JSX.Element> = {
+  today: Today,
+  calendar: Calendar,
+  inbox: Inbox,
+  analytics: Analytics,
+  voice: Voice,
+  settings: Settings,
+};
 
-const queryClient = new QueryClient();
-
-const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <Toaster />
-      <Sonner />
-      <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<Features />} />
-          <Route path="/vision" element={<Vision />} />
-          <Route path="/features" element={<Features />} />
-          <Route path="/solutions" element={<Solutions />} />
-          <Route path="/industry-applications" element={<IndustryApplications />} />
-          <Route path="/future-directions" element={<FutureDirections />} />
-        </Routes>
-      </BrowserRouter>
-    </TooltipProvider>
-  </QueryClientProvider>
-);
-
-export default App;
+export default function App() {
+  const view = useUi((s) => s.view);
+  const Page = PAGES[view];
+  return (
+    <>
+      <Sidebar />
+      <main>
+        <Page />
+      </main>
+      <Toast />
+      <Modal />
+    </>
+  );
+}
