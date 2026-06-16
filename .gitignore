@@ -12,6 +12,12 @@ server/dist
 .env
 server/.env
 
+# sqlite data
+server/data
+*.db
+*.db-shm
+*.db-wal
+
 # logs
 logs
 *.log
