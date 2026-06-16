@@ -6,7 +6,7 @@
  */
 import cron from "node-cron";
 import { publish } from "./publishers.js";
-import { getDueScheduled, markPublished, markFailed, rowToInput } from "./db.js";
+import { getDueScheduled, markPublished, markFailed, rowToInput, trackMetric } from "./db.js";
 
 let running = false; // guard against overlapping ticks
 
@@ -19,6 +19,7 @@ async function tick() {
       const result = await publish(rowToInput(row), row.channel);
       if (result.status === "published" || result.status === "scheduled" || result.status === "manual") {
         markPublished(row.id, result.externalPostId);
+        if (result.externalPostId) trackMetric(result.externalPostId, row.account_id, row.platform);
         console.log(`[scheduler] published ${row.id} (${row.platform}) → ${result.externalPostId ?? result.status}`);
       } else {
         markFailed(row.id, result.error || "unknown");

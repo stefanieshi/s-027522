@@ -1,6 +1,6 @@
 import { useData, useUi } from "../store";
 import { teardownSwipe } from "./llm";
-import { apiPublish, apiSchedule, UNREACHABLE, type PublishInput } from "./api";
+import { apiPublish, apiSchedule, apiTrack, apiGetMetrics, apiRefreshMetrics, UNREACHABLE, type PublishInput } from "./api";
 import { composerUrl, xDmUrl } from "./utils";
 import type { Account, Draft, InboxItem } from "./types";
 
@@ -49,6 +49,7 @@ export async function publishDraftNow(id: string): Promise<void> {
     toast("已打开原生发送框 · 按发送即可");
   } else if (r.status === "published" || r.status === "scheduled") {
     markPublished(r.externalPostId);
+    if (r.externalPostId) void apiTrack(s.apiBase, r.externalPostId, d.account_id, d.platform);
     toast("已通过 " + s.channel + " 发布 ✓");
   } else if (r.error === UNREACHABLE) {
     window.open(composerUrl[d.platform], "_blank");
@@ -77,6 +78,35 @@ export async function scheduleDraftBackend(id: string): Promise<void> {
   } else if (r.error && r.error !== UNREACHABLE) {
     toast("后端排期失败:" + r.error.slice(0, 50));
   }
+}
+
+/** 刷新真实互动数据:触发后端回收 → 拉回已发布帖的 metrics → 写回 drafts。 */
+export async function refreshMetrics(): Promise<void> {
+  const { data } = useData.getState();
+  const s = data.settings;
+  if (!s.useBackend) {
+    toast("先在设置里开启「接后端真发布」");
+    return;
+  }
+  const ids = data.drafts.filter((d) => d.status === "published" && d.externalPostId).map((d) => d.externalPostId!) as string[];
+  if (!ids.length) {
+    toast("还没有带外部 ID 的已发布帖");
+    return;
+  }
+  await apiRefreshMetrics(s.apiBase);
+  const metrics = await apiGetMetrics(s.apiBase, ids);
+  const byId = new Map(metrics.map((m) => [m.externalPostId, m]));
+  let n = 0;
+  useData.getState().setData((dd) => {
+    dd.drafts.forEach((d) => {
+      const m = d.externalPostId && byId.get(d.externalPostId);
+      if (m && m.status === "ok") {
+        d.metrics = { views: m.views, likes: m.likes, engagementRate: m.engagementRate, fetchedAt: m.fetchedAt };
+        n++;
+      }
+    });
+  });
+  toast(n ? `已更新 ${n} 条真实数据 📊` : "暂无可用互动数据(等回收或确认 zernio key)");
 }
 
 /** 收件箱回复发送。reply/dm 后端强制 manual → 打开原生发送框。useBackend 关 → 本地行为。 */

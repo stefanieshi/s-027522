@@ -12,7 +12,8 @@ import express from 'express';
 import cors from 'cors';
 import { publish, zernioAnalytics, type PublishInput, type Channel } from './publishers.js';
 import { startScheduler } from './scheduler.js';
-import { insertScheduled, listScheduled, cancelScheduled, type SchedStatus } from './db.js';
+import { startAnalyticsRefresher, refreshAll } from './analytics.js';
+import { insertScheduled, listScheduled, cancelScheduled, trackMetric, getMetrics, type SchedStatus, type MetricRow } from './db.js';
 
 const app = express();
 app.use(cors({ origin: process.env.FRONTEND_ORIGIN || '*' }));
@@ -65,8 +66,37 @@ app.get('/api/analytics/:postId', async (req, res) => {
   }
 });
 
+/* ===== 真实互动数据(post_metrics) ===== */
+const toMetricDTO = (r: MetricRow) => ({
+  externalPostId: r.external_post_id,
+  accountId: r.account_id,
+  platform: r.platform,
+  views: r.views,
+  likes: r.likes,
+  engagementRate: r.engagement_rate,
+  status: r.status,
+  fetchedAt: r.fetched_at,
+});
+
+app.post('/api/metrics/track', (req, res) => {
+  const { externalPostId, accountId, platform } = req.body as { externalPostId?: string; accountId?: string; platform?: string };
+  if (!externalPostId) return res.status(400).json({ status: 'error', error: '缺少 externalPostId' });
+  trackMetric(externalPostId, accountId, platform);
+  res.json({ status: 'ok' });
+});
+
+app.get('/api/metrics', (req, res) => {
+  const ids = String(req.query.ids || '').split(',').map((s) => s.trim()).filter(Boolean);
+  res.json(getMetrics(ids).map(toMetricDTO));
+});
+
+app.post('/api/metrics/refresh', async (_req, res) => {
+  res.json(await refreshAll());
+});
+
 const port = Number(process.env.PORT) || 8787;
 app.listen(port, () => {
   console.log(`Vibe Marketer backend listening on :${port}`);
   startScheduler();
+  startAnalyticsRefresher();
 });

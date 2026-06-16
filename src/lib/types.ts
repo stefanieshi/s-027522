@@ -72,6 +72,8 @@ export interface Draft {
   externalPostId?: string;
   /** 已交后端排期时回填:DB 里 scheduled_posts.id。 */
   scheduleId?: string;
+  /** 真实互动数据(后端 zernioAnalytics 回收)。 */
+  metrics?: { views: number | null; likes: number | null; engagementRate: number | null; fetchedAt: string | null };
 }
 
 export interface InboxItem {

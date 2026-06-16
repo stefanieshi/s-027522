@@ -37,6 +37,19 @@ CREATE TABLE IF NOT EXISTS scheduled_posts (
   updated_at          TEXT NOT NULL
 );
 CREATE INDEX IF NOT EXISTS idx_sched_status_time ON scheduled_posts(status, scheduled_for);
+
+CREATE TABLE IF NOT EXISTS post_metrics (
+  external_post_id TEXT PRIMARY KEY,
+  account_id       TEXT,
+  platform         TEXT,
+  views            INTEGER,
+  likes            INTEGER,
+  engagement_rate  REAL,
+  status           TEXT NOT NULL DEFAULT 'pending', -- pending|ok|error
+  error            TEXT,
+  fetched_at       TEXT,
+  created_at       TEXT NOT NULL
+);
 `);
 
 export type SchedStatus = "scheduled" | "published" | "error" | "canceled";
@@ -135,6 +148,55 @@ export function rowToInput(row: ScheduledRow): PublishInput {
     mediaUrls: row.media_urls ? (JSON.parse(row.media_urls) as string[]) : undefined,
     targetUrl: row.target_url ?? undefined,
   };
+}
+
+/* ===================== post_metrics(真实互动数据回收) ===================== */
+export interface MetricRow {
+  external_post_id: string;
+  account_id: string | null;
+  platform: string | null;
+  views: number | null;
+  likes: number | null;
+  engagement_rate: number | null;
+  status: "pending" | "ok" | "error";
+  error: string | null;
+  fetched_at: string | null;
+  created_at: string;
+}
+
+/** 注册一个要追踪互动数据的帖(幂等)。发布成功后调一次。 */
+export function trackMetric(externalPostId: string, accountId?: string | null, platform?: string | null): void {
+  db.prepare(
+    `INSERT INTO post_metrics (external_post_id, account_id, platform, status, created_at)
+     VALUES (?, ?, ?, 'pending', ?)
+     ON CONFLICT(external_post_id) DO UPDATE SET
+       account_id = COALESCE(excluded.account_id, post_metrics.account_id),
+       platform   = COALESCE(excluded.platform, post_metrics.platform)`
+  ).run(externalPostId, accountId ?? null, platform ?? null, new Date().toISOString());
+}
+
+export function upsertMetricResult(externalPostId: string, m: { views?: number; likes?: number; engagementRate?: number }): void {
+  db.prepare(
+    "UPDATE post_metrics SET views=?, likes=?, engagement_rate=?, status='ok', error=NULL, fetched_at=? WHERE external_post_id=?"
+  ).run(m.views ?? null, m.likes ?? null, m.engagementRate ?? null, new Date().toISOString(), externalPostId);
+}
+
+export function markMetricError(externalPostId: string, error: string): void {
+  db.prepare("UPDATE post_metrics SET status='error', error=?, fetched_at=? WHERE external_post_id=?").run(
+    error.slice(0, 300),
+    new Date().toISOString(),
+    externalPostId
+  );
+}
+
+export function listTrackedMetricIds(): string[] {
+  return (db.prepare("SELECT external_post_id FROM post_metrics").all() as { external_post_id: string }[]).map((r) => r.external_post_id);
+}
+
+export function getMetrics(ids: string[]): MetricRow[] {
+  if (!ids.length) return [];
+  const ph = ids.map(() => "?").join(",");
+  return db.prepare(`SELECT * FROM post_metrics WHERE external_post_id IN (${ph})`).all(...ids) as MetricRow[];
 }
 
 export default db;

@@ -77,6 +77,48 @@ export async function apiCancelSchedule(apiBase: string, id: string): Promise<bo
   }
 }
 
+/* ===================== 真实互动数据 ===================== */
+export interface Metric {
+  externalPostId: string;
+  accountId: string | null;
+  platform: string | null;
+  views: number | null;
+  likes: number | null;
+  engagementRate: number | null;
+  status: "pending" | "ok" | "error";
+  fetchedAt: string | null;
+}
+
+/** 注册一个帖去追踪真实互动数据(发布成功后调)。 */
+export async function apiTrack(apiBase: string, externalPostId: string, accountId?: string, platform?: string): Promise<void> {
+  try {
+    await postJSON(base(apiBase) + "/api/metrics/track", { externalPostId, accountId, platform });
+  } catch {
+    /* best-effort */
+  }
+}
+
+/** 拉取一批帖的已存互动数据。 */
+export async function apiGetMetrics(apiBase: string, ids: string[]): Promise<Metric[]> {
+  if (!ids.length) return [];
+  try {
+    const res = await fetch(base(apiBase) + "/api/metrics?ids=" + encodeURIComponent(ids.join(",")));
+    if (!res.ok) return [];
+    return (await res.json()) as Metric[];
+  } catch {
+    return [];
+  }
+}
+
+/** 触发后端立刻刷新所有追踪帖的互动数据。 */
+export async function apiRefreshMetrics(apiBase: string): Promise<{ ok: number; err: number } | null> {
+  try {
+    return await postJSON(base(apiBase) + "/api/metrics/refresh", {});
+  } catch {
+    return null;
+  }
+}
+
 /** 后端健康检查(设置页"测试连接"用)。 */
 export async function apiHealth(apiBase: string): Promise<boolean> {
   try {
