@@ -39,6 +39,7 @@ src/
 | GET | `/api/schedule?status=` | 列排期帖 |
 | DELETE | `/api/schedule/:id` | 取消未发的排期 |
 | GET | `/api/analytics/:postId` | zernio 实时互动数据 |
+| GET | `/api/zernio/accounts` | 列出 zernio 已连接账号(拿 `accountId` 填发布) |
 | GET | `/api/metrics?ids=a,b` | 已回收的互动数据 |
 | POST | `/api/metrics/track` | `{ externalPostId, accountId, platform }` 登记追踪 |
 | POST | `/api/metrics/refresh` | 立刻回收所有追踪帖 |
