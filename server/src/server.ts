@@ -19,7 +19,7 @@ import { xAccountsList, xAccountAdd, xAccountsLogin, xAccountDelete } from './so
 import { publicConfig, setConfig } from './config.js';
 import { startMonitor, runOnce } from './monitor.js';
 import {
-  addTracked, listTracked, deleteTracked, listMentions, setMentionStatus, markMentionNotified,
+  addTracked, listTracked, deleteTracked, listMentions, setMentionStatus, markMentionNotified, clearDemoMentions,
   listInspiration, type TrackKind, type MentionStatus, type TrackedRow, type MentionRow, type InspirationRow,
 } from './db.js';
 
@@ -211,6 +211,9 @@ app.post('/api/mentions/:id/:action', (req, res) => {
 app.post('/api/mentions/mark-notified', (req, res) => {
   markMentionNotified((req.body?.ids as string[]) || []);
   res.json({ status: 'ok' });
+});
+app.delete('/api/mentions/demo', (_req, res) => {
+  res.json({ status: 'ok', removed: clearDemoMentions() });
 });
 
 app.get('/api/inspiration', (req, res) => {

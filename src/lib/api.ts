@@ -326,6 +326,16 @@ export async function apiMarkMentionsNotified(apiBase: string, ids: string[]): P
     /* best-effort */
   }
 }
+/** 清除「试跑 demo」造的示例大V回复。返回删除条数。 */
+export async function apiClearDemoMentions(apiBase: string): Promise<number> {
+  try {
+    const res = await fetch(base(apiBase) + "/api/mentions/demo", { method: "DELETE" });
+    if (!res.ok) return 0;
+    return ((await res.json()) as any)?.removed || 0;
+  } catch {
+    return 0;
+  }
+}
 
 export const apiListInspiration = (apiBase: string, platform?: string) =>
   getList<Inspiration>(apiBase, "/api/inspiration" + (platform ? "?platform=" + platform : ""), undefined, "GET");

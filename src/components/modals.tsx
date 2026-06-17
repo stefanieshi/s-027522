@@ -208,6 +208,72 @@ export function SwipeModal() {
   );
 }
 
+/** 批量上传热门素材:多条用空行分隔,逐条建 swipe 并自动 AI 拆解成 pattern。 */
+export function BulkUploadModal() {
+  const setData = useData((s) => s.setData);
+  const { closeModal, toast, setVoiceTab } = useUi();
+  const [platform, setPlatform] = useState<Platform>("x");
+  const [source, setSource] = useState("");
+  const [text, setText] = useState("");
+
+  function save() {
+    const posts = text.split(/\n\s*\n/).map((p) => p.trim()).filter(Boolean);
+    if (!posts.length) {
+      toast("粘贴至少一条素材(多条之间用空行分隔)");
+      return;
+    }
+    const ids: string[] = [];
+    setData((d) => {
+      posts.forEach((raw) => {
+        const id = uid();
+        ids.push(id);
+        d.swipes.unshift({ id, platform, source: source.trim() || "上传", metrics: "", raw, teardown: null, pattern: null });
+      });
+    });
+    closeModal();
+    setVoiceTab("swipe");
+    toast(`已上传 ${posts.length} 条 · AI 拆解中…`);
+    ids.forEach((id) => tearSwipe(id));
+  }
+
+  return (
+    <>
+      <h3>⬆️ 批量上传热门素材</h3>
+      <div className="hint" style={{ marginBottom: 10 }}>
+        把你收集的爆款一条条粘进来,<b>每条之间空一行</b>。保存后 AI 会逐条拆解成可复用 pattern 存进爆款库(只学结构、不抄原文)。
+      </div>
+      <div className="grid2">
+        <label className="fld">
+          <span className="lab">平台</span>
+          <select className="in" value={platform} onChange={(e) => setPlatform(e.target.value as Platform)}>
+            {PLATFORMS.map((p) => (
+              <option key={p} value={p}>
+                {PLAT_LABEL[p]}
+              </option>
+            ))}
+          </select>
+        </label>
+        <label className="fld">
+          <span className="lab">来源(选填)</span>
+          <input className="in" value={source} placeholder="@某大V / 合集" onChange={(e) => setSource(e.target.value)} />
+        </label>
+      </div>
+      <label className="fld">
+        <span className="lab">素材(多条用空行分隔)</span>
+        <textarea className="in" style={{ minHeight: 180 }} value={text} placeholder={"第一条爆款文案…\n\n第二条爆款文案…\n\n第三条…"} onChange={(e) => setText(e.target.value)} />
+      </label>
+      <div className="mfoot">
+        <button className="btn ghost" onClick={closeModal}>
+          取消
+        </button>
+        <button className="btn" onClick={save}>
+          上传并拆解
+        </button>
+      </div>
+    </>
+  );
+}
+
 export function InboxAddModal() {
   const setData = useData((s) => s.setData);
   const { closeModal, toast } = useUi();

@@ -9,7 +9,7 @@ import { generateDraft } from "../lib/llm";
 import { assignSchedule, recomputeSim } from "../lib/schedule";
 import { publishDraftNow, scheduleDraftBackend, tearSwipe } from "../lib/actions";
 import { apiListInspiration, apiRunMonitor } from "../lib/api";
-import { mockTrendsByPlatform, type TrendItem } from "../lib/mockTrends";
+import { type TrendItem } from "../lib/mockTrends";
 import type { Account, Draft, Platform, ResultTier, PublishPostOptions } from "../lib/types";
 
 function isTodayish(d: Draft) {
@@ -230,7 +230,7 @@ function TrendsBar({ selected, setSelected }: { selected: string[]; setSelected:
   const apiBase = useData((s) => s.data.settings.apiBase);
   const setData = useData((s) => s.setData);
   const toast = useUi((s) => s.toast);
-  const [groups, setGroups] = useState<Record<string, TrendItem[]>>(() => mockTrendsByPlatform());
+  const [groups, setGroups] = useState<Record<string, TrendItem[]>>({});
   const [live, setLive] = useState(false);
   const [loading, setLoading] = useState(false);
   const [saved, setSaved] = useState<Record<string, boolean>>({});
@@ -238,29 +238,24 @@ function TrendsBar({ selected, setSelected }: { selected: string[]; setSelected:
 
   async function load(refresh: boolean) {
     if (!useBackend) {
-      setGroups(mockTrendsByPlatform());
+      setGroups({});
       setLive(false);
-      if (refresh) toast("示例热点 · 开启「接后端真发布」+ 加对标账号后变真实");
+      if (refresh) toast("趋势来自真实数据 · 去「设置」开启后端 + 加对标账号");
       return;
     }
     setLoading(true);
     if (refresh) await apiRunMonitor(apiBase);
     const { data } = await apiListInspiration(apiBase);
     setLoading(false);
-    if (data && data.length) {
-      const m: Record<string, TrendItem[]> = {};
-      data.forEach((d) => {
-        const topic = (d.topic || d.raw || "").split("\n")[0].trim().slice(0, 60);
-        if (!topic) return;
-        (m[d.platform] = m[d.platform] || []).push({ platform: d.platform as Platform, topic, score: d.score ?? 0, example: d.raw || topic });
-      });
-      setGroups(m);
-      setLive(true);
-    } else {
-      setGroups(mockTrendsByPlatform());
-      setLive(false);
-      if (refresh) toast("后端暂无灵感 · 配 APIFY_TOKEN + 加对标账号后填充");
-    }
+    const m: Record<string, TrendItem[]> = {};
+    (data || []).forEach((d) => {
+      const topic = (d.topic || d.raw || "").split("\n")[0].trim().slice(0, 60);
+      if (!topic) return;
+      (m[d.platform] = m[d.platform] || []).push({ platform: d.platform as Platform, topic, score: d.score ?? 0, example: d.raw || topic });
+    });
+    setGroups(m);
+    setLive(Object.keys(m).length > 0);
+    if (refresh && !Object.keys(m).length) toast("暂无真实趋势 · 在「话术与人格 → 追踪」加对标账号,并确保已接 X 数据源");
   }
 
   useEffect(() => {
@@ -291,7 +286,7 @@ function TrendsBar({ selected, setSelected }: { selected: string[]; setSelected:
             📈 今日趋势 Scout · 找灵感
           </b>
           <span className="pill-s ps-blue">蹭趋势:{selected.length ? "开 (" + selected.length + ")" : "关"}</span>
-          {open && !live && <span className="pill-s ps-mut">{useBackend ? "示例 · 待后端填充" : "示例"}</span>}
+          {open && live && <span className="pill-s ps-mut">真实数据</span>}
         </div>
         <div className="row" style={{ gap: 7 }}>
           {open && (
@@ -330,7 +325,7 @@ function TrendsBar({ selected, setSelected }: { selected: string[]; setSelected:
                     {it.topic} {it.tag && <span style={{ color: "var(--blue)" }}>#{it.tag}</span>}
                   </div>
                   <div className="hint" style={{ marginTop: 3, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
-                    🔥 热度 {it.score} · 示例:{(it.example || "").slice(0, 44)}…
+                    🔥 热度 {it.score} · 例:{(it.example || "").slice(0, 44)}…
                   </div>
                 </div>
                 <div className="row" style={{ gap: 7 }}>
@@ -346,6 +341,11 @@ function TrendsBar({ selected, setSelected }: { selected: string[]; setSelected:
           })}
         </div>
       ))}
+      {open && !plats.length && (
+        <div className="hint" style={{ marginTop: 4 }}>
+          {loading ? "加载中…" : "还没真实趋势 · 在「话术与人格 → 追踪」加对标账号,接好 X 数据源后点「刷新」(或雷达「现在检查」)。"}
+        </div>
+      )}
     </div>
   );
 }

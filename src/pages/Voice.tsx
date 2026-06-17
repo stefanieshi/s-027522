@@ -4,12 +4,15 @@ import { useData, useUi } from "../store";
 import { PLAT_LABEL, PLATFORMS } from "../lib/constants";
 import { initial } from "../lib/utils";
 import { tearSwipe } from "../lib/actions";
+import { generateDraft } from "../lib/llm";
+import { DEFAULT_TYPE } from "../lib/constants";
+import { recomputeSim } from "../lib/schedule";
 import {
   apiListTracked, apiImportTracked, apiDeleteTracked, UNREACHABLE, type TrackedAccount,
   apiListTwscrapeAccounts, apiAddTwscrapeAccount, apiLoginTwscrapeAccounts, apiDeleteTwscrapeAccount, type TwscrapeAccount,
 } from "../lib/api";
-import { AccountModal, SwipeModal, RadarModal } from "../components/modals";
-import type { Platform } from "../lib/types";
+import { AccountModal, SwipeModal, RadarModal, BulkUploadModal } from "../components/modals";
+import type { Platform, Draft, Swipe } from "../lib/types";
 
 export default function Voice() {
   const voiceTab = useUi((s) => s.voiceTab);
@@ -390,9 +393,40 @@ function SwipeTab() {
   const setData = useData((s) => s.setData);
   const useBackend = useData((s) => s.data.settings.useBackend);
   const openModal = useUi((s) => s.openModal);
+  const toast = useUi((s) => s.toast);
+  const go = useUi((s) => s.go);
+  const [busyId, setBusyId] = useState<string | null>(null);
 
   function del(id: string) {
     if (confirm("删除?")) setData((d) => void (d.swipes = d.swipes.filter((s) => s.id !== id)));
+  }
+
+  /** 用这条爆款的 pattern,给同平台的每个账号各生成一条草稿,进「今日任务」。 */
+  async function genFromSwipe(s: Swipe) {
+    if (!s.pattern) return toast("先点「拆解」,有了 pattern 才能生成");
+    const cur = useData.getState().data;
+    const accts = cur.accounts.filter((a) => a.platform === s.platform);
+    if (!accts.length) return toast(`先加一个 ${PLAT_LABEL[s.platform]} 账号(话术与人格 → 人格)`);
+    setBusyId(s.id);
+    const made: Draft[] = [];
+    let err = "";
+    for (const a of accts) {
+      try {
+        const d = await generateDraft(cur.settings, [...cur.drafts, ...made], a, DEFAULT_TYPE[a.platform], "", s.pattern.template);
+        d.patternId = s.pattern.id;
+        made.push(d);
+      } catch (e: any) {
+        err = e?.message || String(e);
+      }
+    }
+    setBusyId(null);
+    if (!made.length) return toast("生成失败:" + (/NO_KEY/.test(err) ? "先在设置填 AI key" : err.slice(0, 40)));
+    setData((d) => {
+      d.drafts.push(...made);
+      recomputeSim(d.drafts, d.accounts);
+    });
+    toast(`已为 ${made.length} 个账号生成草稿 → 去「今日任务」审核`);
+    go("today");
   }
 
   return (
@@ -400,6 +434,9 @@ function SwipeTab() {
       <div className="row" style={{ marginBottom: 14 }}>
         <button className="btn" onClick={() => openModal(<SwipeModal />)}>
           ＋ 收藏爆款
+        </button>
+        <button className="btn ghost" onClick={() => openModal(<BulkUploadModal />)}>
+          ⬆️ 批量上传素材
         </button>
         {useBackend && (
           <button className="btn ghost" onClick={() => openModal(<RadarModal />)}>
@@ -433,6 +470,11 @@ function SwipeTab() {
               <button className="btn ghost sm" onClick={() => tearSwipe(s.id)}>
                 {s.pattern ? "重拆" : "拆解"}
               </button>
+              {s.pattern && (
+                <button className="btn sm" disabled={busyId === s.id} onClick={() => genFromSwipe(s)}>
+                  {busyId === s.id ? "…" : "✍️ 生成草稿"}
+                </button>
+              )}
               <button className="btn ghost sm" onClick={() => del(s.id)}>
                 删除
               </button>
