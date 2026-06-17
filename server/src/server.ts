@@ -16,6 +16,7 @@ import { startAnalyticsRefresher, refreshAll } from './analytics.js';
 import { insertScheduled, listScheduled, cancelScheduled, trackMetric, getMetrics, type SchedStatus, type MetricRow } from './db.js';
 import { discoverViral, pullComments, fetchTrends, NO_TOKEN } from './sources/apify.js';
 import { xAccountsList, xAccountAdd, xAccountsLogin, xAccountDelete } from './sources/x.js';
+import { publicConfig, setConfig } from './config.js';
 import { startMonitor, runOnce } from './monitor.js';
 import {
   addTracked, listTracked, deleteTracked, listMentions, setMentionStatus, markMentionNotified,
@@ -28,15 +29,21 @@ app.use(express.json({ limit: '2mb' }));
 
 app.get('/health', (_req, res) => res.json({ ok: true }));
 
-/* 集成状态(只返回布尔/枚举,绝不含密钥)——前端据此判断数据源是否接好、空白页该提示啥 */
+/* 集成状态(只返回布尔/枚举/掩码,绝不含明文密钥)——前端据此判断数据源是否接好、空白页该提示啥 */
 app.get('/api/status', (_req, res) => {
-  res.json({
-    apifyToken: !!process.env.APIFY_TOKEN,
-    xSource: process.env.X_SOURCE || 'apify',
-    redditSource: process.env.REDDIT_SOURCE || 'apify',
-    anthropic: !!process.env.ANTHROPIC_API_KEY,
-    zernio: !!process.env.ZERNIO_API_KEY,
-  });
+  const c = publicConfig();
+  res.json({ apifyToken: c.apifyToken, xSource: c.xSource, redditSource: c.redditSource, anthropic: c.anthropic.set, zernio: c.zernio.set });
+});
+
+/* 运行期配置:让用户在网页里填 key/开关,不必改 .env。GET 只回掩码,POST 写本地 config.json */
+app.get('/api/config', (_req, res) => res.json(publicConfig()));
+app.post('/api/config', (req, res) => {
+  try {
+    setConfig((req.body || {}) as Record<string, unknown>);
+    res.json(publicConfig());
+  } catch (e: any) {
+    res.status(500).json({ error: e?.message || String(e) });
+  }
 });
 
 app.post('/api/publish', async (req, res) => {

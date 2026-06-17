@@ -6,6 +6,7 @@
  */
 import Zernio from "@zernio/node";
 import type { Publisher, PublishInput, PublishResult, Platform, PublishOptions } from "./types.js";
+import { cfg } from "../config.js";
 
 /* 平台名映射:我们 app 用 'x',zernio 用 'twitter' */
 const ZERNIO_PLATFORM: Record<Platform, string> = {
@@ -26,10 +27,14 @@ const APP_PLATFORM: Record<string, string> = { twitter: "x" };
  * 只有真正用到 zernio 渠道时才构造,缺 key 时给清晰错误。
  */
 let _client: Zernio | null = null;
+let _clientKey: string | undefined;
 function client(): Zernio {
-  if (_client) return _client;
+  const key = cfg("ZERNIO_API_KEY"); // 存储优先,回退 env
+  if (!key) throw new Error("Zernio 未配置:在网页「设置 → 连接」填 ZERNIO_API_KEY(或 server/.env)");
+  if (_client && _clientKey === key) return _client; // key 变了就重建
   try {
-    _client = new Zernio(); // 读 ZERNIO_API_KEY 环境变量
+    _client = new Zernio({ apiKey: key });
+    _clientKey = key;
     return _client;
   } catch (e: any) {
     throw new Error("Zernio 未配置:" + (e?.message || String(e)));

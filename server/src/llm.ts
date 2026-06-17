@@ -3,6 +3,8 @@
  * 用 ANTHROPIC_API_KEY 调 Claude;没 key → 返回 mock 草稿(仍照常通知/approve)。
  * 敏感(法律/版权/担保流量等)→ flagged,给克制、不做承诺的回应。
  */
+import { cfg } from "./config.js";
+
 const MODEL = process.env.ANTHROPIC_MODEL || "claude-sonnet-4-6";
 
 export interface DraftedReply {
@@ -27,7 +29,7 @@ export async function draftReply(opts: {
   guideline?: string;
   persona?: string;
 }): Promise<DraftedReply> {
-  const key = process.env.ANTHROPIC_API_KEY?.trim();
+  const key = cfg("ANTHROPIC_API_KEY")?.trim();
   if (!key) return mockReply(opts.postText, opts.guideline);
 
   const sys =
