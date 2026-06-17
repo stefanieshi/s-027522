@@ -12,6 +12,14 @@ function apifyToast(error: string | undefined, toast: (m: string) => void): void
   else if (error) toast("抓取失败:" + error.slice(0, 50));
 }
 
+/** 不同平台「发现/趋势」的查询入参说明。 */
+export function queryLabel(p: Platform): string {
+  return p === "tiktok" ? "话题 / hashtag" : p === "reddit" ? "关键词 / subreddit" : "账号 @handle";
+}
+export function queryPlaceholder(p: Platform): string {
+  return p === "tiktok" ? "buildinpublic" : p === "reddit" ? "indie hackers" : "@levelsio";
+}
+
 export function AccountModal({ id }: { id?: string }) {
   const setData = useData((s) => s.setData);
   const existing = useData((s) => (id ? s.data.accounts.find((a) => a.id === id) : undefined));
@@ -234,7 +242,7 @@ export function RadarModal() {
 
   async function search() {
     if (!query.trim()) {
-      toast(platform === "tiktok" ? "输入话题/hashtag" : "输入 @handle");
+      toast("请输入" + queryLabel(platform));
       return;
     }
     setLoading(true);
@@ -268,6 +276,7 @@ export function RadarModal() {
           <select className="in" value={platform} onChange={(e) => setPlatform(e.target.value as Platform)}>
             <option value="tiktok">TikTok(话题)</option>
             <option value="x">X(@handle)</option>
+            <option value="reddit">Reddit(关键词)</option>
           </select>
         </label>
         <label className="fld">
@@ -276,11 +285,11 @@ export function RadarModal() {
         </label>
       </div>
       <label className="fld">
-        <span className="lab">{platform === "tiktok" ? "话题 / hashtag" : "账号 @handle"}</span>
+        <span className="lab">{queryLabel(platform)}</span>
         <input
           className="in"
           value={query}
-          placeholder={platform === "tiktok" ? "buildinpublic" : "@levelsio"}
+          placeholder={queryPlaceholder(platform)}
           onChange={(e) => setQuery(e.target.value)}
           onKeyDown={(e) => e.key === "Enter" && search()}
         />
@@ -373,7 +382,7 @@ export function PullInboxModal() {
     <>
       <h3>⬇️ 拉取互动</h3>
       <div className="hint" style={{ marginBottom: 12 }}>
-        从公开帖子抓评论/回复进收件箱,助手草回复后仍由你一键打开原生发送框人工发。支持 Instagram、X。
+        从公开帖子抓评论/回复进收件箱,助手草回复后仍由你一键打开原生发送框人工发。支持 Instagram、X、TikTok、Reddit。
       </div>
       <div className="grid2">
         <label className="fld">
@@ -381,6 +390,8 @@ export function PullInboxModal() {
           <select className="in" value={platform} onChange={(e) => setPlatform(e.target.value as Platform)}>
             <option value="instagram">Instagram</option>
             <option value="x">X</option>
+            <option value="tiktok">TikTok</option>
+            <option value="reddit">Reddit</option>
           </select>
         </label>
         <label className="fld">

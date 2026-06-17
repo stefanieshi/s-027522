@@ -7,6 +7,7 @@ import { generateDraft } from "../lib/llm";
 import { assignSchedule, recomputeSim } from "../lib/schedule";
 import { publishDraftNow, scheduleDraftBackend } from "../lib/actions";
 import { apiTrends, NO_APIFY_TOKEN, UNREACHABLE } from "../lib/api";
+import { queryLabel, queryPlaceholder } from "../components/modals";
 import type { Account, Draft, Platform, ResultTier, PublishPostOptions } from "../lib/types";
 
 function isTodayish(d: Draft) {
@@ -197,7 +198,7 @@ function TrendsBar({ selected, setSelected }: { selected: string[]; setSelected:
 
   async function fetchTrends() {
     if (!niche.trim()) {
-      toast(platform === "tiktok" ? "输入话题/hashtag" : "输入 @handle");
+      toast("请输入" + queryLabel(platform));
       return;
     }
     setLoading(true);
@@ -251,11 +252,12 @@ function TrendsBar({ selected, setSelected }: { selected: string[]; setSelected:
               <select className="in" value={platform} onChange={(e) => setPlatform(e.target.value as Platform)}>
                 <option value="tiktok">TikTok(话题)</option>
                 <option value="x">X(@handle)</option>
+                <option value="reddit">Reddit(关键词)</option>
               </select>
             </label>
             <label className="fld" style={{ marginBottom: 0, flex: 1 }}>
-              <span className="lab">{platform === "tiktok" ? "话题 / hashtag" : "账号 @handle"}</span>
-              <input className="in" value={niche} onChange={(e) => setNiche(e.target.value)} onKeyDown={(e) => e.key === "Enter" && fetchTrends()} placeholder={platform === "tiktok" ? "buildinpublic" : "@levelsio"} />
+              <span className="lab">{queryLabel(platform)}</span>
+              <input className="in" value={niche} onChange={(e) => setNiche(e.target.value)} onKeyDown={(e) => e.key === "Enter" && fetchTrends()} placeholder={queryPlaceholder(platform)} />
             </label>
             <button className="btn sm" disabled={loading} onClick={fetchTrends}>
               {loading ? <span className="spin" /> : "抓取"}

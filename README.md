@@ -19,16 +19,25 @@ reply / DM 永远人工发,绝不程序化自动发(防 X 封号的安全主线)
 
 > 不填 Anthropic key 也能用:自动进入 **mock 模式**,可完整体验全流程。
 
-## 快速开始(前端)
+## 快速开始
 
 需要 Node.js 18+。
 
+**一键起前后端**(自动装依赖 + 建 `server/.env`):
+
+```bash
+./dev.sh          # 或 npm run dev:all  → 前端 :5173 · 后端 :8787
+```
+
+或只起前端:
+
 ```bash
 npm install
-npm run dev      # → http://localhost:5173
+npm run dev       # → http://localhost:5173
 ```
 
 到「设置」里填入 Anthropic API Key(`sk-ant-…`)即可让 Claude 真正起草;留空则用 mock。
+后端配置见 [`server/README.md`](./server/README.md)。
 
 ## 后端(真发布 + 排期)
 

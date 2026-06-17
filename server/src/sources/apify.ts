@@ -12,9 +12,11 @@ export const NO_TOKEN = "NO_APIFY_TOKEN";
 
 const ACTORS = {
   tiktokHashtag: process.env.APIFY_ACTOR_TIKTOK_HASHTAG || "clockworks/tiktok-hashtag-scraper",
+  tiktokComments: process.env.APIFY_ACTOR_TIKTOK_COMMENTS || "clockworks/tiktok-comments-scraper",
   xProfile: process.env.APIFY_ACTOR_X_PROFILE || "scraper_one/x-profile-posts-scraper",
   xReplies: process.env.APIFY_ACTOR_X_REPLIES || "scraper_one/x-post-replies-scraper",
   igComments: process.env.APIFY_ACTOR_IG_COMMENTS || "apify/instagram-comment-scraper",
+  reddit: process.env.APIFY_ACTOR_REDDIT || "harshmaur/reddit-scraper", // posts+comments+search
 };
 
 export interface ViralCandidate {
@@ -94,7 +96,21 @@ export async function discoverViral(opts: { platform: Platform; query: string; l
       url: String(pick(it, "url", "twitterUrl") || ""),
     }));
   }
-  // instagram / reddit 发现:留待补对应 actor
+  if (opts.platform === "reddit") {
+    const items = await runActor(
+      ACTORS.reddit,
+      { searchTerms: [q], searchPosts: true, searchComments: false, maxPostsCount: limit, maxItems: limit },
+      limit
+    );
+    return items.map((it) => ({
+      platform: "reddit" as const,
+      source: "u/" + (pick<string>(it, "username", "author") ?? "reddit"),
+      raw: [pick(it, "title"), pick(it, "body", "text", "selftext")].filter(Boolean).join("\n").trim(),
+      metrics: `⬆${fmt(pick(it, "upVotes", "score", "upvotes"))}·💬${fmt(pick(it, "numberOfComments", "numComments", "commentCount"))}`,
+      url: String(pick(it, "url", "link", "postUrl") || ""),
+    }));
+  }
+  // instagram 发现:留待补对应 actor
   return [];
 }
 
@@ -120,7 +136,28 @@ export async function pullComments(opts: { platform: Platform; postUrls: string[
       msg: String(pick(it, "text", "fullText") || ""),
     }));
   }
-  // tiktok / reddit 评论:留待补对应 actor
+  if (opts.platform === "tiktok") {
+    const items = await runActor(ACTORS.tiktokComments, { postURLs: urls, commentsPerPost: limit }, limit);
+    return items.map((it) => ({
+      platform: "tiktok" as const,
+      from: "@" + (pick<string>(it, "uniqueId", "username", "userName") ?? it?.user?.uniqueId ?? "tiktok_user"),
+      msg: String(pick(it, "text", "comment") || ""),
+    }));
+  }
+  if (opts.platform === "reddit") {
+    const items = await runActor(
+      ACTORS.reddit,
+      { startUrls: urls.map((url) => ({ url })), searchPosts: false, crawlCommentsPerPost: true, maxCommentsPerPost: limit, maxCommentsCount: limit, maxPostsCount: urls.length },
+      limit
+    );
+    return items
+      .map((it) => ({
+        platform: "reddit" as const,
+        from: "u/" + (pick<string>(it, "username", "author") ?? "reddit_user"),
+        msg: String(pick(it, "body", "comment", "text") || ""),
+      }))
+      .filter((c) => c.msg);
+  }
   return [];
 }
 
