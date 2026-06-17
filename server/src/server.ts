@@ -15,6 +15,7 @@ import { startScheduler } from './scheduler.js';
 import { startAnalyticsRefresher, refreshAll } from './analytics.js';
 import { insertScheduled, listScheduled, cancelScheduled, trackMetric, getMetrics, type SchedStatus, type MetricRow } from './db.js';
 import { discoverViral, pullComments, fetchTrends, NO_TOKEN } from './sources/apify.js';
+import { xAccountsList, xAccountAdd, xAccountsLogin, xAccountDelete } from './sources/x.js';
 import { startMonitor, runOnce } from './monitor.js';
 import {
   addTracked, listTracked, deleteTracked, listMentions, setMentionStatus, markMentionNotified,
@@ -200,6 +201,42 @@ app.get('/api/inspiration', (req, res) => {
 app.post('/api/monitor/run', async (req, res) => {
   try {
     res.json(await runOnce(!!(req.body && req.body.demo)));
+  } catch (e: any) {
+    res.status(500).json({ error: e?.message || String(e) });
+  }
+});
+
+/* ===== X 抓取小号(twscrape)账号管理:代理到本机 sidecar ===== */
+app.get('/api/twscrape/accounts', async (_req, res) => {
+  try {
+    res.json(await xAccountsList());
+  } catch (e: any) {
+    res.status(500).json({ error: e?.message || String(e) });
+  }
+});
+app.post('/api/twscrape/accounts/add', async (req, res) => {
+  const { username, password, email, emailPassword } = req.body as {
+    username?: string; password?: string; email?: string; emailPassword?: string;
+  };
+  if (!username || !password || !email || !emailPassword) {
+    return res.status(400).json({ error: '缺少 用户名 / 密码 / 邮箱 / 邮箱密码' });
+  }
+  try {
+    res.json(await xAccountAdd({ username, password, email, email_password: emailPassword }));
+  } catch (e: any) {
+    res.status(500).json({ error: e?.message || String(e) });
+  }
+});
+app.post('/api/twscrape/accounts/login', async (_req, res) => {
+  try {
+    res.json(await xAccountsLogin());
+  } catch (e: any) {
+    res.status(500).json({ error: e?.message || String(e) });
+  }
+});
+app.delete('/api/twscrape/accounts/:username', async (req, res) => {
+  try {
+    res.json(await xAccountDelete(req.params.username));
   } catch (e: any) {
     res.status(500).json({ error: e?.message || String(e) });
   }

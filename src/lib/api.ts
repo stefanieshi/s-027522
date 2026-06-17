@@ -154,6 +154,50 @@ export async function apiZernioAccounts(apiBase: string): Promise<{ data: Zernio
   }
 }
 
+/* ===================== X 抓取小号(twscrape)管理 ===================== */
+export interface TwscrapeAccount {
+  username: string;
+  active: boolean;
+  logged_in: boolean;
+  last_used?: string | null;
+  total_req?: number | null;
+  error_msg?: string | null;
+}
+
+/** 列出本机 sidecar 里的 X 小号(GET)。后端没连上/未起 sidecar → error。 */
+export const apiListTwscrapeAccounts = (apiBase: string) =>
+  getList<TwscrapeAccount>(apiBase, "/api/twscrape/accounts", undefined, "GET");
+
+/** 添加并尝试登录一个 X 小号。凭据只发到本机后端→sidecar,不入库不上传。 */
+export async function apiAddTwscrapeAccount(
+  apiBase: string,
+  body: { username: string; password: string; email: string; emailPassword: string }
+): Promise<{ ok?: boolean; logged_in?: boolean; login_error?: string | null; error?: string }> {
+  try {
+    return await postJSON(base(apiBase) + "/api/twscrape/accounts/add", body);
+  } catch (e: any) {
+    return { error: isNetwork(e) ? UNREACHABLE : e?.message || String(e) };
+  }
+}
+
+/** 重新登录所有未激活小号。 */
+export async function apiLoginTwscrapeAccounts(apiBase: string): Promise<{ total?: number; active?: number; error?: string }> {
+  try {
+    return await postJSON(base(apiBase) + "/api/twscrape/accounts/login", {});
+  } catch (e: any) {
+    return { error: isNetwork(e) ? UNREACHABLE : e?.message || String(e) };
+  }
+}
+
+export async function apiDeleteTwscrapeAccount(apiBase: string, username: string): Promise<boolean> {
+  try {
+    const res = await fetch(base(apiBase) + "/api/twscrape/accounts/" + encodeURIComponent(username), { method: "DELETE" });
+    return res.ok;
+  } catch {
+    return false;
+  }
+}
+
 /* ===================== 真实互动数据 ===================== */
 export interface Metric {
   externalPostId: string;
