@@ -1,10 +1,11 @@
 import { useState } from "react";
 import TopBar from "../components/TopBar";
 import { useData, useUi } from "../store";
-import { PLAT_LABEL } from "../lib/constants";
-import { initial } from "../lib/utils";
+import { PLAT_LABEL, AV } from "../lib/constants";
+import { initial, uid } from "../lib/utils";
 import { generateReply } from "../lib/llm";
 import { sendInboxReply } from "../lib/actions";
+import { apiPullInbox } from "../lib/api";
 import { InboxAddModal, PullInboxModal } from "../components/modals";
 import type { InboxItem } from "../lib/types";
 
@@ -13,6 +14,39 @@ export default function Inbox() {
   const setData = useData((s) => s.setData);
   const { toast, openModal } = useUi();
   const [genningAll, setGenningAll] = useState(false);
+  const [pulling, setPulling] = useState(false);
+
+  /** 拉「我用本工具发过的帖」下面的真实评论(按平台分组调 /api/inbox/pull)。 */
+  async function pullMine() {
+    const cur = useData.getState().data;
+    if (!cur.settings.useBackend) return toast("先在「设置」开启接后端");
+    const byPlat: Record<string, string[]> = {};
+    cur.drafts.forEach((d) => {
+      if (d.publishedUrl) (byPlat[d.platform] = byPlat[d.platform] || []).push(d.publishedUrl);
+    });
+    const plats = Object.keys(byPlat);
+    if (!plats.length) return toast("还没用本工具发过帖 · 可用「拉取互动」手动贴帖链接");
+    setPulling(true);
+    let added = 0;
+    let lastErr = "";
+    for (const p of plats) {
+      const { data: comments, error } = await apiPullInbox(cur.settings.apiBase, p, byPlat[p], 20);
+      if (error) { lastErr = error; continue; }
+      setData((d) => {
+        const seen = new Set(d.inbox.map((m) => m.from + "|" + m.msg));
+        comments.forEach((c) => {
+          const k = c.from + "|" + c.msg;
+          if (c.msg && !seen.has(k)) {
+            seen.add(k);
+            added++;
+            d.inbox.unshift({ id: uid(), from: c.from, platform: c.platform, color: AV[Math.floor(Math.random() * AV.length)], msg: c.msg, reply: "", status: "new", flagged: false });
+          }
+        });
+      });
+    }
+    setPulling(false);
+    toast(added ? `已拉入 ${added} 条真实评论` : lastErr ? "拉取失败:" + lastErr.slice(0, 40) : "暂无新评论");
+  }
 
   const autoReply = data.settings.autoReply;
 
@@ -46,23 +80,6 @@ export default function Inbox() {
     toast("回复已生成");
   }
 
-  if (!data.inbox.length) {
-    return (
-      <>
-        <TopBar view="inbox" right={right} />
-        <div className="view">
-          <div className="empty">
-            <b>收件箱是空的</b>对方主动发来的评论/私信会出现在这里。
-            <br />
-            <button className="btn ghost sm" style={{ marginTop: 12 }} onClick={() => openModal(<InboxAddModal />)}>
-              + 手动加一条(测试)
-            </button>
-          </div>
-        </div>
-      </>
-    );
-  }
-
   const need = data.inbox.filter((m) => m.flagged && m.status !== "sent");
   const gen = data.inbox.filter((m) => m.reply && !m.flagged && m.status !== "sent");
   const pendingNoReply = data.inbox.filter((m) => !m.reply && !m.flagged && m.status !== "sent");
@@ -85,25 +102,39 @@ export default function Inbox() {
       <TopBar view="inbox" right={right} />
       <div className="view">
         <div className="banner">
-          ℹ️ MVP:收件箱目前可手动添加;上线后接各平台 API 自动拉取真实互动。回复一律"一键打开原生发送框 + 你按发送",不走自动直发(冷自动 DM 会被封)。
+          ℹ️ 这里是<b>真实评论</b>:你<b>用本工具发过的帖</b>下的留言(点「🔄 拉我的帖评论」),或你手动贴帖链接抓取(「拉取互动」)。
+          <b>私信(DM)平台禁止抓取</b>,只能你在原 App 看。回复一律"打开原生发送框 + 你按发送",不自动直发(防封)。
         </div>
         <div className="row" style={{ marginBottom: 16 }}>
           <button className="btn" disabled={genningAll} onClick={genAll}>
             {genningAll ? <span className="spin" /> : "✨"} 一键生成所有回复
           </button>
           {data.settings.useBackend && (
-            <button className="btn ghost" onClick={() => openModal(<PullInboxModal />)}>
-              ⬇️ 拉取互动
-            </button>
+            <>
+              <button className="btn ghost" disabled={pulling} onClick={pullMine}>
+                {pulling ? <span className="spin" /> : "🔄"} 拉我的帖评论
+              </button>
+              <button className="btn ghost" onClick={() => openModal(<PullInboxModal />)}>
+                ⬇️ 贴链接拉评论
+              </button>
+            </>
           )}
           <button className="btn ghost" onClick={() => openModal(<InboxAddModal />)}>
-            + 加一条消息
+            + 手动加一条
           </button>
         </div>
-        {block("需要你确认(敏感)", need)}
-        {block("回复已生成", gen)}
-        {block("待生成回复", pendingNoReply)}
-        {block("已发送", done)}
+        {data.inbox.length ? (
+          <>
+            {block("需要你确认(敏感)", need)}
+            {block("回复已生成", gen)}
+            {block("待生成回复", pendingNoReply)}
+            {block("已发送", done)}
+          </>
+        ) : (
+          <div className="empty">
+            <b>收件箱是空的</b>用上面的「🔄 拉我的帖评论」或「贴链接拉评论」把真实留言拉进来。
+          </div>
+        )}
       </div>
     </>
   );

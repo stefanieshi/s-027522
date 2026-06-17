@@ -4,7 +4,7 @@ import { useData, useUi } from "../store";
 import { PLAT_LABEL } from "../lib/constants";
 import { initial, xReplyUrl } from "../lib/utils";
 import { fmtNum } from "../lib/stats";
-import { apiListMentions, apiMentionAction, apiListTracked, apiListInspiration, apiRunMonitor, apiStatus, type Mention, type Inspiration, type BackendStatus } from "../lib/api";
+import { apiListMentions, apiMentionAction, apiListTracked, apiListInspiration, apiRunMonitor, apiStatus, apiClearDemoMentions, type Mention, type Inspiration, type BackendStatus } from "../lib/api";
 
 function ago(iso: string): { label: string; urgent: boolean } {
   const ms = Date.now() - new Date(iso).getTime();
@@ -58,8 +58,16 @@ export default function Radar() {
     await apiRunMonitor(apiBase, true);
     await load();
     setChecking(false);
-    toast("已生成 demo 示例 · 这就是大V回复长的样子(可点忽略清掉)");
+    toast("已生成 demo 示例 · 这就是大V回复长的样子(看完点「清除示例」)");
   }
+  async function clearDemo() {
+    setChecking(true);
+    const n = await apiClearDemoMentions(apiBase);
+    await load();
+    setChecking(false);
+    toast(n ? `已清除 ${n} 条示例` : "没有示例可清");
+  }
+  const hasDemo = mentions.some((m) => /^\(demo\)/.test(m.postText || ""));
 
   /** 没接数据源时的统一提示块 + 去设置 + 试跑 demo。 */
   const NoSource = () => (
@@ -74,6 +82,7 @@ export default function Radar() {
 
   const right = useBackend ? (
     <div className="row" style={{ gap: 8 }}>
+      {hasDemo && <button className="btn ghost sm" disabled={checking} onClick={clearDemo}>🧹 清除示例</button>}
       <button className="btn ghost sm" disabled={checking} onClick={runDemo}>🧪 试跑 demo</button>
       <button className="btn ghost sm" disabled={checking} onClick={checkNow}>
         {checking ? <span className="spin" /> : "🛰️"} 现在检查

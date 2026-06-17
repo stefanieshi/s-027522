@@ -357,6 +357,10 @@ export function listUnnotifiedMentions(): MentionRow[] {
 export function setMentionStatus(id: string, status: MentionStatus): boolean {
   return db.prepare("UPDATE mentions SET status=? WHERE id=?").run(status, id).changes > 0;
 }
+/** 清掉「试跑 demo」造的示例大V回复(postId 以 demo- 开头或正文带 (demo) 前缀)。 */
+export function clearDemoMentions(): number {
+  return db.prepare("DELETE FROM mentions WHERE post_id LIKE 'demo-%' OR post_text LIKE '(demo)%'").run().changes;
+}
 export function markMentionNotified(ids: string[]): void {
   if (!ids.length) return;
   const stmt = db.prepare("UPDATE mentions SET notified=1 WHERE id=?");
