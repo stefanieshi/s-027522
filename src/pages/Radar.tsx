@@ -4,7 +4,7 @@ import { useData, useUi } from "../store";
 import { PLAT_LABEL } from "../lib/constants";
 import { initial, xReplyUrl } from "../lib/utils";
 import { fmtNum } from "../lib/stats";
-import { apiListMentions, apiMentionAction, apiListTracked, apiListInspiration, apiRunMonitor, type Mention, type Inspiration } from "../lib/api";
+import { apiListMentions, apiMentionAction, apiListTracked, apiListInspiration, apiRunMonitor, apiStatus, type Mention, type Inspiration, type BackendStatus } from "../lib/api";
 
 function ago(iso: string): { label: string; urgent: boolean } {
   const ms = Date.now() - new Date(iso).getTime();
@@ -22,14 +22,21 @@ export default function Radar() {
   const [counts, setCounts] = useState({ bigv: 0, competitor: 0 });
   const [insp, setInsp] = useState<Inspiration[]>([]);
   const [checking, setChecking] = useState(false);
+  const [status, setStatus] = useState<BackendStatus | null>(null);
+
+  /** X 数据源是否接好:配了 APIFY_TOKEN,或 X 走免费 twscrape。 */
+  const xReady = !!status && (status.apifyToken || status.xSource === "twscrape");
 
   async function load() {
     if (!useBackend) return;
-    const [m, t, i] = await Promise.all([apiListMentions(apiBase, "drafted"), apiListTracked(apiBase), apiListInspiration(apiBase)]);
+    const [m, t, i, s] = await Promise.all([
+      apiListMentions(apiBase, "drafted"), apiListTracked(apiBase), apiListInspiration(apiBase), apiStatus(apiBase),
+    ]);
     setMentions(m.data);
     setRadarCount(m.data.length);
     setCounts({ bigv: t.data.filter((x) => x.kind === "bigv").length, competitor: t.data.filter((x) => x.kind === "competitor").length });
     setInsp(i.data.slice(0, 12));
+    setStatus(s);
   }
   useEffect(() => {
     load();
@@ -40,16 +47,37 @@ export default function Radar() {
 
   async function checkNow() {
     setChecking(true);
-    await apiRunMonitor(apiBase);
+    const r = await apiRunMonitor(apiBase);
     await load();
     setChecking(false);
-    toast("已检查一次");
+    if (r?.skipped === "NO_APIFY_TOKEN") toast("后端还没接 X 数据源:去 server/.env 填 APIFY_TOKEN 再重启");
+    else toast(`已检查 · 新增 ${r?.mentions ?? 0} 条待回复 / ${r?.inspiration ?? 0} 条灵感`);
+  }
+  async function runDemo() {
+    setChecking(true);
+    await apiRunMonitor(apiBase, true);
+    await load();
+    setChecking(false);
+    toast("已生成 demo 示例 · 这就是大V回复长的样子(可点忽略清掉)");
   }
 
+  /** 没接数据源时的统一提示块 + 试跑 demo。 */
+  const NoSource = () => (
+    <div className="banner" style={{ marginBottom: 18 }}>
+      ⚠️ 还没接 <b>X 数据源</b>,所以抓不到大V/对标账号的帖子。去 <code>server/.env</code> 填 <code>APIFY_TOKEN</code> 再重启 <code>npm run dev:all</code>,然后点右上「现在检查」。
+      <div style={{ marginTop: 10 }}>
+        <button className="btn sm" disabled={checking} onClick={runDemo}>🧪 先试跑 demo 看效果</button>
+      </div>
+    </div>
+  );
+
   const right = useBackend ? (
-    <button className="btn ghost sm" disabled={checking} onClick={checkNow}>
-      {checking ? <span className="spin" /> : "🛰️"} 现在检查
-    </button>
+    <div className="row" style={{ gap: 8 }}>
+      <button className="btn ghost sm" disabled={checking} onClick={runDemo}>🧪 试跑 demo</button>
+      <button className="btn ghost sm" disabled={checking} onClick={checkNow}>
+        {checking ? <span className="spin" /> : "🛰️"} 现在检查
+      </button>
+    </div>
   ) : undefined;
 
   if (!useBackend) {
@@ -103,13 +131,15 @@ export default function Radar() {
         <div className="sect" style={{ marginTop: 0 }}>大V待回复 {mentions.length ? `· ${mentions.length}` : ""}</div>
         {mentions.length ? (
           mentions.map((m) => <MentionCard key={m.id} m={m} apiBase={apiBase} onChange={load} toast={toast} />)
+        ) : !xReady ? (
+          <NoSource />
         ) : (
           <div className="hint" style={{ marginBottom: 18 }}>暂无大V新帖待回复 · 监控每几分钟扫一次,也可点右上「现在检查」。</div>
         )}
 
-        {!!insp.length && (
+        <div className="sect">💡 niche 灵感流</div>
+        {insp.length ? (
           <>
-            <div className="sect">💡 niche 灵感流</div>
             {insp.map((it, i) => (
               <div className="swrow" key={i} style={{ alignItems: "center" }}>
                 <div style={{ flex: 1, minWidth: 0 }}>
@@ -130,6 +160,8 @@ export default function Radar() {
               </div>
             ))}
           </>
+        ) : (
+          <div className="hint">{xReady ? "暂无灵感 · 监控会从对标账号抓热门帖,点右上「现在检查」试试" : "(接上 X 数据源后,这里会出现对标账号的热门帖,点「用它生成」一键复刻)"}</div>
         )}
       </div>
     </>

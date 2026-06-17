@@ -28,6 +28,17 @@ app.use(express.json({ limit: '2mb' }));
 
 app.get('/health', (_req, res) => res.json({ ok: true }));
 
+/* 集成状态(只返回布尔/枚举,绝不含密钥)——前端据此判断数据源是否接好、空白页该提示啥 */
+app.get('/api/status', (_req, res) => {
+  res.json({
+    apifyToken: !!process.env.APIFY_TOKEN,
+    xSource: process.env.X_SOURCE || 'apify',
+    redditSource: process.env.REDDIT_SOURCE || 'apify',
+    anthropic: !!process.env.ANTHROPIC_API_KEY,
+    zernio: !!process.env.ZERNIO_API_KEY,
+  });
+});
+
 app.post('/api/publish', async (req, res) => {
   const { input, channel } = req.body as { input: PublishInput; channel: Channel };
   if (!input?.text || !input?.platform || !input?.kind) {
