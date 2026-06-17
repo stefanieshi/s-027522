@@ -5,6 +5,7 @@ import RadarPoller from "./components/RadarPoller";
 import Today from "./pages/Today";
 import Calendar from "./pages/Calendar";
 import Inbox from "./pages/Inbox";
+import Radar from "./pages/Radar";
 import Analytics from "./pages/Analytics";
 import Voice from "./pages/Voice";
 import Settings from "./pages/Settings";
@@ -15,6 +16,7 @@ const PAGES: Record<ViewId, () => JSX.Element> = {
   today: Today,
   calendar: Calendar,
   inbox: Inbox,
+  radar: Radar,
   analytics: Analytics,
   voice: Voice,
   settings: Settings,

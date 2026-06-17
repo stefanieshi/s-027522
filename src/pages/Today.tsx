@@ -1,5 +1,7 @@
 import { useState, useEffect } from "react";
 import TopBar from "../components/TopBar";
+import NorthStar from "../components/NorthStar";
+import Onboarding from "../components/Onboarding";
 import { useData, useUi } from "../store";
 import { DEFAULT_TYPE, PLAT_LABEL, PLAT_TIME, TYPES } from "../lib/constants";
 import { composerUrl, fmtTime, initial, isToday, uid } from "../lib/utils";
@@ -18,6 +20,8 @@ export default function Today() {
   const data = useData((s) => s.data);
   const setData = useData((s) => s.setData);
   const { toast, setExpanded } = useUi();
+  const radarCount = useUi((s) => s.radarCount);
+  const go = useUi((s) => s.go);
   const [showTag, setShowTag] = useState(false);
   const [generating, setGenerating] = useState(false);
   const [seedTopics, setSeedTopics] = useState<string[]>([]);
@@ -110,11 +114,23 @@ export default function Today() {
     <>
       <TopBar view="today" right={right} />
       <div className="view">
+        <NorthStar />
+        <Onboarding onGenerate={genToday} generating={generating} />
+
+        {radarCount > 0 && (
+          <div className="card" style={{ marginBottom: 16, padding: "12px 16px", borderColor: "#F3D8CF", background: "linear-gradient(160deg,var(--brand-soft),#FFF6F1)" }}>
+            <div className="row" style={{ justifyContent: "space-between", alignItems: "center" }}>
+              <b style={{ fontSize: 13.5, color: "var(--brand-deep)" }}>📡 {radarCount} 条大V新帖待回复 · 越快回越吃流量</b>
+              <button className="btn sm" onClick={() => go("radar")}>
+                去雷达处理
+              </button>
+            </div>
+          </div>
+        )}
+
         <PersonaStrip />
 
-        <TrendsBar selected={seedTopics} setSelected={setSeedTopics} />
-
-        {showBigGen && (
+        {showBigGen && !generating && (
           <div className="card" style={{ textAlign: "center", padding: 34, marginBottom: 16 }}>
             <div className="display" style={{ fontSize: 20, marginBottom: 6 }}>
               今天还没生成内容 🌱
@@ -125,6 +141,19 @@ export default function Today() {
             <button className="btn" disabled={generating} onClick={genToday}>
               {generating ? <span className="spin" /> : "✨"} 一键生成今日内容
             </button>
+          </div>
+        )}
+
+        {generating && (
+          <div className="dgrid" style={{ marginBottom: 16 }}>
+            {Array.from({ length: Math.max(2, data.accounts.length) }).map((_, i) => (
+              <div className="draft" key={i} style={{ padding: 14 }}>
+                <div className="skeleton" style={{ height: 14, width: "55%", marginBottom: 10 }} />
+                <div className="skeleton" style={{ height: 12, marginBottom: 6 }} />
+                <div className="skeleton" style={{ height: 12, width: "85%", marginBottom: 6 }} />
+                <div className="skeleton" style={{ height: 12, width: "70%" }} />
+              </div>
+            ))}
           </div>
         )}
 
@@ -154,6 +183,8 @@ export default function Today() {
         {plats.map((p) => (
           <PlatformCard key={p} p={p} acctOf={acctOf} onApprove={approvePlat} />
         ))}
+
+        <TrendsBar selected={seedTopics} setSelected={setSeedTopics} />
       </div>
     </>
   );
@@ -193,6 +224,7 @@ function TrendsBar({ selected, setSelected }: { selected: string[]; setSelected:
   const [live, setLive] = useState(false);
   const [loading, setLoading] = useState(false);
   const [saved, setSaved] = useState<Record<string, boolean>>({});
+  const [open, setOpen] = useState(false);
 
   async function load(refresh: boolean) {
     if (!useBackend) {
@@ -243,21 +275,28 @@ function TrendsBar({ selected, setSelected }: { selected: string[]; setSelected:
 
   return (
     <div className="card" style={{ marginBottom: 16 }}>
-      <div className="row" style={{ justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
+      <div className="row" style={{ justifyContent: "space-between", alignItems: "center", marginBottom: open || selected.length ? 12 : 0 }}>
         <div className="row" style={{ alignItems: "center", gap: 9 }}>
           <b className="display" style={{ fontSize: 15 }}>
-            📈 今日趋势 Scout
+            📈 今日趋势 Scout · 找灵感
           </b>
-          <span className="pill-s ps-blue">生成时蹭趋势:{selected.length ? "开 (" + selected.length + ")" : "关"}</span>
-          {!live && <span className="pill-s ps-mut">{useBackend ? "示例 · 待后端填充" : "示例"}</span>}
+          <span className="pill-s ps-blue">蹭趋势:{selected.length ? "开 (" + selected.length + ")" : "关"}</span>
+          {open && !live && <span className="pill-s ps-mut">{useBackend ? "示例 · 待后端填充" : "示例"}</span>}
         </div>
-        <button className="btn ghost sm" disabled={loading} onClick={() => load(true)}>
-          {loading ? <span className="spin" /> : "⟳"} 刷新趋势
-        </button>
+        <div className="row" style={{ gap: 7 }}>
+          {open && (
+            <button className="btn ghost sm" disabled={loading} onClick={() => load(true)}>
+              {loading ? <span className="spin" /> : "⟳"} 刷新
+            </button>
+          )}
+          <button className="btn ghost sm" onClick={() => setOpen((v) => !v)}>
+            {open ? "收起" : "展开找灵感"}
+          </button>
+        </div>
       </div>
 
       {selected.length > 0 && (
-        <div className="row" style={{ gap: 6, marginBottom: 12 }}>
+        <div className="row" style={{ gap: 6, marginBottom: open ? 12 : 0 }}>
           {selected.map((t) => (
             <button key={t} className="pill-s ps-brand" style={{ border: "none", cursor: "pointer" }} onClick={() => toggle(t)} title="点掉移除">
               {t.slice(0, 24)} ✕
@@ -266,7 +305,7 @@ function TrendsBar({ selected, setSelected }: { selected: string[]; setSelected:
         </div>
       )}
 
-      {plats.map((p) => (
+      {open && plats.map((p) => (
         <div key={p} style={{ marginBottom: 10 }}>
           <span className={"platTag p-" + p} style={{ display: "inline-block", marginBottom: 8 }}>
             {PLAT_LABEL[p as Platform]}
@@ -285,7 +324,7 @@ function TrendsBar({ selected, setSelected }: { selected: string[]; setSelected:
                   </div>
                 </div>
                 <div className="row" style={{ gap: 7 }}>
-                  <button className={"btn sm " + (sel ? "" : "ghost")} onClick={() => toggle(it.topic)}>
+                  <button className={"btn sm " + (sel ? "" : "soft")} onClick={() => toggle(it.topic)}>
                     {sel ? "✓ 已选" : "用它生成"}
                   </button>
                   <button className="btn ghost sm" disabled={!!saved[key]} onClick={() => save(it, key)}>
