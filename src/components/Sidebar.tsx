@@ -5,6 +5,7 @@ const NAV: { id: ViewId; icon: string; label: string }[] = [
   { id: "today", icon: "🏠", label: "今日任务" },
   { id: "calendar", icon: "📅", label: "日历排期" },
   { id: "inbox", icon: "✉️", label: "收件箱" },
+  { id: "radar", icon: "📡", label: "雷达" },
   { id: "analytics", icon: "📊", label: "账号分析" },
   { id: "voice", icon: "🎭", label: "话术与人格" },
   { id: "settings", icon: "⚙️", label: "设置" },
@@ -16,7 +17,7 @@ export default function Sidebar() {
   const radarCount = useUi((s) => s.radarCount);
   const data = useData((s) => s.data);
 
-  const ibCount = data.inbox.filter((m) => m.status === "new" || (m.reply && m.status !== "sent")).length + radarCount;
+  const ibCount = data.inbox.filter((m) => m.status === "new" || (m.reply && m.status !== "sent")).length;
   const hasKey = data.settings.apiKey.trim().length > 0;
   const runStatus = hasKey ? "运行正常 · Claude " + data.settings.model.replace("claude-", "") : "运行正常 · mock 模式";
 
@@ -44,6 +45,7 @@ export default function Sidebar() {
             <span className="ic">{n.icon}</span>
             {n.label}
             {n.id === "inbox" && ibCount > 0 && <span className="pill">{ibCount}</span>}
+            {n.id === "radar" && radarCount > 0 && <span className="pill">{radarCount}</span>}
           </button>
         ))}
       </nav>

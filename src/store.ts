@@ -30,6 +30,7 @@ function freshState(): AppData {
       apiBase: "http://localhost:8787",
       channel: "manual",
       notifyDesktop: true,
+      onboardingDismissed: false,
     },
   };
 }

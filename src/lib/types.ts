@@ -122,6 +122,8 @@ export interface Settings {
   channel: Channel;
   /** 大V雷达:桌面通知 + 提醒音 */
   notifyDesktop: boolean;
+  /** 上手清单已忽略 */
+  onboardingDismissed?: boolean;
 }
 
 export interface AppData {
@@ -133,4 +135,4 @@ export interface AppData {
   settings: Settings;
 }
 
-export type ViewId = "today" | "calendar" | "inbox" | "analytics" | "voice" | "settings";
+export type ViewId = "today" | "calendar" | "inbox" | "radar" | "analytics" | "voice" | "settings";

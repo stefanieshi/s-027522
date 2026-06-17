@@ -56,6 +56,11 @@ export const META: Record<ViewId, { eb: string; t: string; d: string }> = {
     t: "收件箱",
     d: "对方主动发来的评论/私信,助手已草好回复,你确认后一键打开原生发送框发出。",
   },
+  radar: {
+    eb: "增长雷达",
+    t: "📡 雷达",
+    d: "追踪的大V一发新帖,AI 第一时间草拟回复 → 你审核「一键发送」(人工发,守红线)。下方是 niche 灵感流。",
+  },
   analytics: {
     eb: "账号看板",
     t: "账号分析",
