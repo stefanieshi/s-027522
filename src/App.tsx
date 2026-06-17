@@ -1,6 +1,7 @@
 import Sidebar from "./components/Sidebar";
 import Toast from "./components/Toast";
 import Modal from "./components/Modal";
+import RadarPoller from "./components/RadarPoller";
 import Today from "./pages/Today";
 import Calendar from "./pages/Calendar";
 import Inbox from "./pages/Inbox";
@@ -30,6 +31,7 @@ export default function App() {
       </main>
       <Toast />
       <Modal />
+      <RadarPoller />
     </>
   );
 }

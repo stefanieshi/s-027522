@@ -13,9 +13,10 @@ const NAV: { id: ViewId; icon: string; label: string }[] = [
 export default function Sidebar() {
   const view = useUi((s) => s.view);
   const go = useUi((s) => s.go);
+  const radarCount = useUi((s) => s.radarCount);
   const data = useData((s) => s.data);
 
-  const ibCount = data.inbox.filter((m) => m.status === "new" || (m.reply && m.status !== "sent")).length;
+  const ibCount = data.inbox.filter((m) => m.status === "new" || (m.reply && m.status !== "sent")).length + radarCount;
   const hasKey = data.settings.apiKey.trim().length > 0;
   const runStatus = hasKey ? "运行正常 · Claude " + data.settings.model.replace("claude-", "") : "运行正常 · mock 模式";
 

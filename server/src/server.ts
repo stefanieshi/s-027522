@@ -15,6 +15,11 @@ import { startScheduler } from './scheduler.js';
 import { startAnalyticsRefresher, refreshAll } from './analytics.js';
 import { insertScheduled, listScheduled, cancelScheduled, trackMetric, getMetrics, type SchedStatus, type MetricRow } from './db.js';
 import { discoverViral, pullComments, fetchTrends, NO_TOKEN } from './sources/apify.js';
+import { startMonitor, runOnce } from './monitor.js';
+import {
+  addTracked, listTracked, deleteTracked, listMentions, setMentionStatus, markMentionNotified,
+  listInspiration, type TrackKind, type MentionStatus, type TrackedRow, type MentionRow, type InspirationRow,
+} from './db.js';
 
 const app = express();
 app.use(cors({ origin: process.env.FRONTEND_ORIGIN || '*' }));
@@ -131,9 +136,70 @@ app.post('/api/trends', async (req, res) => {
   }
 });
 
+/* ===== 追踪雷达:对标/大V 账号 + 大V回复待办 + niche 灵感 ===== */
+const trackedDTO = (r: TrackedRow) => ({
+  id: r.id, platform: r.platform, handle: r.handle, kind: r.kind, niche: r.niche,
+  replyAccountId: r.reply_account_id, guideline: r.reply_guideline, lastChecked: r.last_checked, active: !!r.active,
+});
+const mentionDTO = (r: MentionRow) => ({
+  id: r.id, platform: r.platform, postUrl: r.post_url, postText: r.post_text, author: r.author,
+  reply: r.draft_reply, flagged: !!r.flagged, status: r.status, createdAt: r.created_at,
+});
+const inspirationDTO = (r: InspirationRow) => ({
+  platform: r.platform, source: r.source, raw: r.raw, metrics: r.metrics, url: r.url, topic: r.topic, score: r.score,
+});
+
+app.get('/api/tracked', (req, res) => {
+  res.json(listTracked(req.query.kind as TrackKind | undefined).map(trackedDTO));
+});
+app.post('/api/tracked/import', (req, res) => {
+  const { platform, kind, handles, niche, replyAccountId, guideline } = req.body as {
+    platform: string; kind: TrackKind; handles: string[]; niche?: string; replyAccountId?: string; guideline?: string;
+  };
+  if (!platform || !kind || !handles?.length) return res.status(400).json({ error: '缺少 platform / kind / handles' });
+  let n = 0;
+  for (const raw of handles) {
+    const handle = String(raw).trim();
+    if (!handle) continue;
+    addTracked({ platform, handle, kind, niche, replyAccountId, guideline });
+    n++;
+  }
+  res.json({ status: 'ok', added: n });
+});
+app.delete('/api/tracked/:id', (req, res) => {
+  const ok = deleteTracked(req.params.id);
+  res.status(ok ? 200 : 404).json({ status: ok ? 'ok' : 'not_found' });
+});
+
+app.get('/api/mentions', (req, res) => {
+  res.json(listMentions(req.query.status as MentionStatus | undefined).map(mentionDTO));
+});
+app.post('/api/mentions/:id/:action', (req, res) => {
+  const map: Record<string, MentionStatus> = { approve: 'approved', sent: 'sent', ignore: 'ignored' };
+  const status = map[req.params.action];
+  if (!status) return res.status(400).json({ error: '未知操作' });
+  res.status(setMentionStatus(req.params.id, status) ? 200 : 404).json({ status });
+});
+app.post('/api/mentions/mark-notified', (req, res) => {
+  markMentionNotified((req.body?.ids as string[]) || []);
+  res.json({ status: 'ok' });
+});
+
+app.get('/api/inspiration', (req, res) => {
+  res.json(listInspiration(req.query.platform as string | undefined).map(inspirationDTO));
+});
+app.post('/api/monitor/run', async (req, res) => {
+  try {
+    res.json(await runOnce(!!(req.body && req.body.demo)));
+  } catch (e: any) {
+    res.status(500).json({ error: e?.message || String(e) });
+  }
+});
+
 const port = Number(process.env.PORT) || 8787;
 app.listen(port, () => {
   console.log(`Vibe Marketer backend listening on :${port}`);
   startScheduler();
   startAnalyticsRefresher();
+  startMonitor();
 });

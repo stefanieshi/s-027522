@@ -2,7 +2,8 @@ import { useState } from "react";
 import TopBar from "../components/TopBar";
 import { useData, useUi } from "../store";
 import { MODELS, CHANNELS } from "../lib/constants";
-import { apiHealth } from "../lib/api";
+import { apiHealth, apiRunMonitor } from "../lib/api";
+import { ensurePermission, alertNewMentions } from "../lib/notify";
 import type { AppData, Channel } from "../lib/types";
 
 function localStorageWorks(): boolean {
@@ -34,7 +35,9 @@ export default function Settings() {
   const [useBackend, setUseBackend] = useState(settings.useBackend);
   const [apiBase, setApiBase] = useState(settings.apiBase);
   const [channel, setChannel] = useState<Channel>(settings.channel);
+  const [notifyDesktop, setNotifyDesktop] = useState(settings.notifyDesktop);
   const [testing, setTesting] = useState(false);
+  const [checking, setChecking] = useState(false);
 
   function save() {
     setData((d) => {
@@ -49,6 +52,7 @@ export default function Settings() {
       s.useBackend = useBackend;
       s.apiBase = apiBase.trim();
       s.channel = channel;
+      s.notifyDesktop = notifyDesktop;
     });
     toast("设置已保存");
   }
@@ -58,6 +62,31 @@ export default function Settings() {
     const ok = await apiHealth(apiBase.trim());
     setTesting(false);
     toast(ok ? "后端连上了 ✓ " + apiBase.trim() : "连不上 · 确认后端已 npm run dev");
+  }
+
+  async function toggleNotify() {
+    const next = !notifyDesktop;
+    setNotifyDesktop(next);
+    if (next) {
+      const ok = await ensurePermission();
+      toast(ok ? "桌面通知已开启 🔔" : "浏览器拒绝了通知权限,请在地址栏权限里允许");
+    }
+  }
+
+  async function testNotify() {
+    const ok = await ensurePermission();
+    if (!ok) {
+      toast("请先允许浏览器通知权限");
+      return;
+    }
+    alertNewMentions(1, "这是一条测试:大V 刚发了新帖,AI 已草拟回复 ✍️");
+  }
+
+  async function checkNow() {
+    setChecking(true);
+    const r = await apiRunMonitor(apiBase.trim());
+    setChecking(false);
+    toast(r ? `已检查 · 新增 ${r.mentions} 条待回复 / ${r.inspiration} 灵感源` : "检查失败 · 确认后端在跑");
   }
 
   function exportData() {
@@ -161,6 +190,22 @@ export default function Settings() {
           <button className="btn ghost sm" disabled={testing} onClick={testConn}>
             {testing ? <span className="spin" /> : "🔌"} 测试连接
           </button>
+
+          <div className="sect">📡 追踪雷达 · 大V监控通知</div>
+          <label className="toggle" style={{ marginBottom: 10 }} onClick={toggleNotify}>
+            桌面通知 + 提醒音 <span className={"sw" + (notifyDesktop ? " on" : "")} />
+          </label>
+          <div className="hint" style={{ marginBottom: 10 }}>
+            后端监控到大V新帖 → AI 草拟回复 → 这里<b>桌面弹窗 + 提醒音</b>通知你,去「收件箱 → 📡 大V雷达」审核发送。大V/对标账号在「话术与人格 → 📡 追踪」批量添加。
+          </div>
+          <div className="row">
+            <button className="btn ghost sm" onClick={testNotify}>
+              🔔 测试通知
+            </button>
+            <button className="btn ghost sm" disabled={checking} onClick={checkNow}>
+              {checking ? <span className="spin" /> : "🛰️"} 现在检查一次
+            </button>
+          </div>
 
           <div className="sect">时间设置 · X 帖错峰防封</div>
           <div className="grid2">

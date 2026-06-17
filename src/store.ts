@@ -29,6 +29,7 @@ function freshState(): AppData {
       useBackend: false,
       apiBase: "http://localhost:8787",
       channel: "manual",
+      notifyDesktop: true,
     },
   };
 }
@@ -123,14 +124,16 @@ export { freshState, seeded };
 interface UiStore {
   view: ViewId;
   expanded: Record<string, boolean>;
-  voiceTab: "persona" | "tmpl" | "swipe";
+  voiceTab: "persona" | "tmpl" | "swipe" | "track";
   calMonth: { y: number; m: number } | null;
   toastMsg: string;
   modal: ReactNode | null;
+  radarCount: number;
+  setRadarCount: (n: number) => void;
   go: (v: ViewId) => void;
   toggleExpanded: (p: string) => void;
   setExpanded: (p: string, v: boolean) => void;
-  setVoiceTab: (t: "persona" | "tmpl" | "swipe") => void;
+  setVoiceTab: (t: "persona" | "tmpl" | "swipe" | "track") => void;
   setCalMonth: (m: { y: number; m: number } | null) => void;
   toast: (m: string) => void;
   openModal: (node: ReactNode) => void;
@@ -146,6 +149,8 @@ export const useUi = create<UiStore>((set) => ({
   calMonth: null,
   toastMsg: "",
   modal: null,
+  radarCount: 0,
+  setRadarCount: (n) => set({ radarCount: n }),
   go: (v) => set({ view: v, expanded: {} }),
   toggleExpanded: (p) => set((s) => ({ expanded: { ...s.expanded, [p]: !s.expanded[p] } })),
   setExpanded: (p, v) => set((s) => ({ expanded: { ...s.expanded, [p]: v } })),

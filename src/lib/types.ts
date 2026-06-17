@@ -120,6 +120,8 @@ export interface Settings {
   useBackend: boolean;
   apiBase: string;
   channel: Channel;
+  /** 大V雷达:桌面通知 + 提醒音 */
+  notifyDesktop: boolean;
 }
 
 export interface AppData {

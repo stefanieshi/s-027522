@@ -1,10 +1,12 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import TopBar from "../components/TopBar";
 import { useData, useUi } from "../store";
-import { PLAT_LABEL } from "../lib/constants";
+import { PLAT_LABEL, PLATFORMS } from "../lib/constants";
 import { initial } from "../lib/utils";
 import { tearSwipe } from "../lib/actions";
+import { apiListTracked, apiImportTracked, apiDeleteTracked, UNREACHABLE, type TrackedAccount } from "../lib/api";
 import { AccountModal, SwipeModal, RadarModal } from "../components/modals";
+import type { Platform } from "../lib/types";
 
 export default function Voice() {
   const voiceTab = useUi((s) => s.voiceTab);
@@ -21,6 +23,9 @@ export default function Voice() {
       <button className={voiceTab === "swipe" ? "active" : ""} onClick={() => setVoiceTab("swipe")}>
         爆款库
       </button>
+      <button className={voiceTab === "track" ? "active" : ""} onClick={() => setVoiceTab("track")}>
+        📡 追踪
+      </button>
     </div>
   );
 
@@ -31,8 +36,170 @@ export default function Voice() {
         {voiceTab === "persona" && <PersonaTab />}
         {voiceTab === "tmpl" && <TemplateTab />}
         {voiceTab === "swipe" && <SwipeTab />}
+        {voiceTab === "track" && <TrackTab />}
       </div>
     </>
+  );
+}
+
+function TrackTab() {
+  const { useBackend, apiBase } = useData((s) => s.data.settings);
+  const accounts = useData((s) => s.data.accounts);
+  const toast = useUi((s) => s.toast);
+  const [list, setList] = useState<TrackedAccount[]>([]);
+  const [loading, setLoading] = useState(false);
+
+  async function load() {
+    if (!useBackend) return;
+    const { data } = await apiListTracked(apiBase);
+    setList(data);
+  }
+  useEffect(() => {
+    load();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [useBackend, apiBase]);
+
+  if (!useBackend) {
+    return (
+      <div className="empty">
+        <b>追踪需要后端</b>
+        去「设置 → 后端真发布」开启并连上后端,即可批量追踪对标账号、监控大V。
+      </div>
+    );
+  }
+
+  const competitors = list.filter((t) => t.kind === "competitor");
+  const bigvs = list.filter((t) => t.kind === "bigv");
+
+  async function del(id: string) {
+    if (await apiDeleteTracked(apiBase, id)) {
+      setList((l) => l.filter((t) => t.id !== id));
+    }
+  }
+
+  return (
+    <>
+      <div className="banner">
+        ℹ️ 批量追踪:<b>对标账号</b>用于自动抓你 niche 的热门内容喂「今日趋势」;<b>大V账号</b>会被后端监控,新帖第一时间 AI 草拟回复 + 通知你审核(reply 永远人工发)。
+      </div>
+      <div className="grid2" style={{ alignItems: "start" }}>
+        <ImportCard kind="competitor" title="🎯 对标账号(找灵感)" accounts={accounts} apiBase={apiBase} onDone={load} toast={toast} />
+        <ImportCard kind="bigv" title="📡 大V账号(监控+回复)" accounts={accounts} apiBase={apiBase} onDone={load} toast={toast} />
+      </div>
+
+      <div className="sect">已追踪 · 对标 {competitors.length}</div>
+      <TrackedList rows={competitors} onDelete={del} loading={loading} />
+      <div className="sect">已追踪 · 大V {bigvs.length}</div>
+      <TrackedList rows={bigvs} onDelete={del} loading={loading} />
+    </>
+  );
+}
+
+function ImportCard({
+  kind,
+  title,
+  accounts,
+  apiBase,
+  onDone,
+  toast,
+}: {
+  kind: "competitor" | "bigv";
+  title: string;
+  accounts: { id: string; handle: string }[];
+  apiBase: string;
+  onDone: () => void;
+  toast: (m: string) => void;
+}) {
+  const [platform, setPlatform] = useState<Platform>("x");
+  const [handles, setHandles] = useState("");
+  const [niche, setNiche] = useState("");
+  const [replyAccountId, setReplyAccountId] = useState(accounts[0]?.id || "");
+  const [guideline, setGuideline] = useState("");
+  const [busy, setBusy] = useState(false);
+
+  async function submit() {
+    const arr = handles.split(/[\n,]/).map((s) => s.trim()).filter(Boolean);
+    if (!arr.length) {
+      toast("贴一些账号(每行一个)");
+      return;
+    }
+    setBusy(true);
+    const r = await apiImportTracked(apiBase, { platform, kind, handles: arr, niche: niche.trim() || undefined, replyAccountId: kind === "bigv" ? replyAccountId : undefined, guideline: kind === "bigv" ? guideline.trim() || undefined : undefined });
+    setBusy(false);
+    if ("error" in r) {
+      toast(r.error === UNREACHABLE ? "后端未连上" : "导入失败:" + r.error.slice(0, 40));
+      return;
+    }
+    setHandles("");
+    toast(`已加入 ${r.added} 个`);
+    onDone();
+  }
+
+  return (
+    <div className="card">
+      <div className="sect" style={{ marginTop: 0 }}>
+        {title}
+      </div>
+      <label className="fld">
+        <span className="lab">平台</span>
+        <select className="in" value={platform} onChange={(e) => setPlatform(e.target.value as Platform)}>
+          {PLATFORMS.map((p) => (
+            <option key={p} value={p}>
+              {PLAT_LABEL[p]}
+            </option>
+          ))}
+        </select>
+      </label>
+      <label className="fld">
+        <span className="lab">账号(每行一个 handle / URL)</span>
+        <textarea className="in" style={{ minHeight: 80 }} value={handles} placeholder={"@levelsio\n@naval"} onChange={(e) => setHandles(e.target.value)} />
+      </label>
+      {kind === "competitor" ? (
+        <label className="fld">
+          <span className="lab">niche 关键词(选填,辅助找灵感)</span>
+          <input className="in" value={niche} placeholder="buildinpublic / indie hackers" onChange={(e) => setNiche(e.target.value)} />
+        </label>
+      ) : (
+        <>
+          <label className="fld">
+            <span className="lab">以哪个号的人格回复</span>
+            <select className="in" value={replyAccountId} onChange={(e) => setReplyAccountId(e.target.value)}>
+              {accounts.map((a) => (
+                <option key={a.id} value={a.id}>
+                  {a.handle}
+                </option>
+              ))}
+            </select>
+          </label>
+          <label className="fld">
+            <span className="lab">回复基调(选填)</span>
+            <input className="in" value={guideline} placeholder="真诚、给具体经验、不奉承" onChange={(e) => setGuideline(e.target.value)} />
+          </label>
+        </>
+      )}
+      <button className="btn" disabled={busy} onClick={submit}>
+        {busy ? <span className="spin" /> : "＋"} 批量导入
+      </button>
+    </div>
+  );
+}
+
+function TrackedList({ rows, onDelete }: { rows: TrackedAccount[]; onDelete: (id: string) => void; loading?: boolean }) {
+  if (!rows.length) return <div className="hint" style={{ marginBottom: 8 }}>还没有,用上面批量导入。</div>;
+  return (
+    <div className="row" style={{ gap: 8 }}>
+      {rows.map((t) => (
+        <span key={t.id} className="pill-s ps-mut" style={{ gap: 7 }}>
+          <span className={"platTag p-" + t.platform} style={{ fontSize: 9 }}>
+            {PLAT_LABEL[t.platform as Platform] || t.platform}
+          </span>
+          @{t.handle}
+          <button onClick={() => onDelete(t.id)} style={{ border: "none", background: "none", color: "var(--ink-3)", cursor: "pointer" }} title="移除">
+            ✕
+          </button>
+        </span>
+      ))}
+    </div>
   );
 }
 

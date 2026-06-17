@@ -17,7 +17,16 @@ const ACTORS = {
   xReplies: process.env.APIFY_ACTOR_X_REPLIES || "scraper_one/x-post-replies-scraper",
   igComments: process.env.APIFY_ACTOR_IG_COMMENTS || "apify/instagram-comment-scraper",
   reddit: process.env.APIFY_ACTOR_REDDIT || "harshmaur/reddit-scraper", // posts+comments+search
+  tiktokProfile: process.env.APIFY_ACTOR_TIKTOK_PROFILE || "clockworks/tiktok-scraper",
 };
+
+export interface LatestPost {
+  postId: string;
+  url: string;
+  text: string;
+  author: string;
+  ts?: string;
+}
 
 export interface ViralCandidate {
   platform: Platform;
@@ -176,4 +185,47 @@ export async function fetchTrends(opts: { platform: Platform; query: string; lim
     if (topics.length >= 10) break;
   }
   return topics;
+}
+
+/* ---------- 大V监控:抓某账号最新帖(newest first) ---------- */
+export async function fetchAccountLatest(opts: { platform: Platform; handle: string; limit?: number }): Promise<LatestPost[]> {
+  const limit = Math.min(20, Math.max(1, opts.limit || 5));
+  const h = opts.handle.replace(/^@/, "").replace(/^u\//, "").trim();
+  if (!h) return [];
+
+  if (opts.platform === "x") {
+    const items = await runActor(ACTORS.xProfile, { profileUrls: [`https://x.com/${h}`], resultsLimit: limit }, limit);
+    return items.map((it) => ({
+      postId: String(pick(it, "id", "tweetId", "id_str") || pick(it, "url") || ""),
+      url: String(pick(it, "url", "twitterUrl") || ""),
+      text: String(pick(it, "text", "fullText", "content") || ""),
+      author: "@" + (pick<string>(it, "authorUsername") ?? pick<string>(it?.author, "userName") ?? h),
+      ts: pick<string>(it, "createdAt", "created_at"),
+    }));
+  }
+  if (opts.platform === "tiktok") {
+    const items = await runActor(ACTORS.tiktokProfile, { profiles: [h], resultsPerPage: limit, shouldDownloadVideos: false }, limit);
+    return items.map((it) => ({
+      postId: String(pick(it, "id") || pick(it, "webVideoUrl") || ""),
+      url: String(pick(it, "webVideoUrl", "url") || ""),
+      text: String(pick(it, "text", "desc") || ""),
+      author: "@" + (it?.authorMeta?.name ?? h),
+      ts: pick<string>(it, "createTimeISO", "createTime"),
+    }));
+  }
+  if (opts.platform === "reddit") {
+    const items = await runActor(
+      ACTORS.reddit,
+      { startUrls: [{ url: `https://www.reddit.com/user/${h}/submitted/` }], searchPosts: true, searchComments: false, maxPostsCount: limit },
+      limit
+    );
+    return items.map((it) => ({
+      postId: String(pick(it, "id", "postId") || pick(it, "url") || ""),
+      url: String(pick(it, "url", "link", "postUrl") || ""),
+      text: [pick(it, "title"), pick(it, "body", "text")].filter(Boolean).join("\n").trim(),
+      author: "u/" + (pick<string>(it, "username", "author") ?? h),
+      ts: pick<string>(it, "createdAt", "created"),
+    })).filter((p) => p.url || p.postId);
+  }
+  return [];
 }
