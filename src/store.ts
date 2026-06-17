@@ -69,13 +69,16 @@ interface DataStore {
   setData: (mutate: (d: AppData) => void) => void;
   /** Replace the whole dataset (import / reset). */
   replace: (d: AppData) => void;
+  /** 载入示例数据(演示用)。 */
   resetSeed: () => void;
+  /** 清空所有内容(账号/爆款/草稿/收件箱),保留你的设置(key/后端地址等)。 */
+  clearContent: () => void;
 }
 
 export const useData = create<DataStore>()(
   persist(
     (set) => ({
-      data: seeded(),
+      data: freshState(), // 默认空:不塞示例数据,避免和真实数据混淆
       setData: (mutate) =>
         set((s) => {
           const next = structuredClone(s.data);
@@ -84,6 +87,7 @@ export const useData = create<DataStore>()(
         }),
       replace: (d) => set({ data: d }),
       resetSeed: () => set({ data: seeded() }),
+      clearContent: () => set((s) => ({ data: { ...freshState(), settings: s.data.settings } })),
     }),
     {
       name: DB_KEY,
