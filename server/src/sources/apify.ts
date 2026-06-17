@@ -6,9 +6,14 @@
  * 需要 env APIFY_TOKEN;actor id 可用 env 覆盖(默认值已用 search-actors 核实)。
  * 调用方式:Apify run-sync-get-dataset-items,直接拿 dataset 数组。
  */
+import { xDiscover, xUserLatest, xReplies } from "./x.js";
+
 type Platform = "x" | "tiktok" | "instagram" | "reddit";
 
 export const NO_TOKEN = "NO_APIFY_TOKEN";
+
+/** X 免费源(twscrape)开关:X_SOURCE=twscrape 时,x 平台抓取走 sidecar。 */
+const useTwscrape = () => process.env.X_SOURCE === "twscrape";
 
 const ACTORS = {
   tiktokHashtag: process.env.APIFY_ACTOR_TIKTOK_HASHTAG || "clockworks/tiktok-hashtag-scraper",
@@ -84,6 +89,8 @@ export async function discoverViral(opts: { platform: Platform; query: string; l
   const q = (opts.query || "").trim();
   if (!q) return [];
 
+  if (opts.platform === "x" && useTwscrape()) return xDiscover(q, limit);
+
   if (opts.platform === "tiktok") {
     const items = await runActor(ACTORS.tiktokHashtag, { hashtags: [q.replace(/^#/, "")], resultsPerPage: limit }, limit);
     return items.map((it) => ({
@@ -128,6 +135,8 @@ export async function pullComments(opts: { platform: Platform; postUrls: string[
   const limit = Math.min(100, Math.max(1, opts.limit || 20));
   const urls = (opts.postUrls || []).map((u) => u.trim()).filter(Boolean);
   if (!urls.length) return [];
+
+  if (opts.platform === "x" && useTwscrape()) return xReplies(urls, limit);
 
   if (opts.platform === "instagram") {
     const items = await runActor(ACTORS.igComments, { directUrls: urls, resultsLimit: limit }, limit);
@@ -192,6 +201,8 @@ export async function fetchAccountLatest(opts: { platform: Platform; handle: str
   const limit = Math.min(20, Math.max(1, opts.limit || 5));
   const h = opts.handle.replace(/^@/, "").replace(/^u\//, "").trim();
   if (!h) return [];
+
+  if (opts.platform === "x" && useTwscrape()) return xUserLatest(h, limit);
 
   if (opts.platform === "x") {
     const items = await runActor(ACTORS.xProfile, { profileUrls: [`https://x.com/${h}`], resultsLimit: limit }, limit);
