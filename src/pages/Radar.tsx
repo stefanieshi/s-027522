@@ -50,7 +50,7 @@ export default function Radar() {
     const r = await apiRunMonitor(apiBase);
     await load();
     setChecking(false);
-    if (r?.skipped === "NO_APIFY_TOKEN") toast("后端还没接 X 数据源:去 server/.env 填 APIFY_TOKEN 再重启");
+    if (r?.skipped === "NO_APIFY_TOKEN") toast("还没接 X 数据源 · 去「设置 → 连接」填 Apify Token");
     else toast(`已检查 · 新增 ${r?.mentions ?? 0} 条待回复 / ${r?.inspiration ?? 0} 条灵感`);
   }
   async function runDemo() {
@@ -61,12 +61,13 @@ export default function Radar() {
     toast("已生成 demo 示例 · 这就是大V回复长的样子(可点忽略清掉)");
   }
 
-  /** 没接数据源时的统一提示块 + 试跑 demo。 */
+  /** 没接数据源时的统一提示块 + 去设置 + 试跑 demo。 */
   const NoSource = () => (
     <div className="banner" style={{ marginBottom: 18 }}>
-      ⚠️ 还没接 <b>X 数据源</b>,所以抓不到大V/对标账号的帖子。去 <code>server/.env</code> 填 <code>APIFY_TOKEN</code> 再重启 <code>npm run dev:all</code>,然后点右上「现在检查」。
-      <div style={{ marginTop: 10 }}>
-        <button className="btn sm" disabled={checking} onClick={runDemo}>🧪 先试跑 demo 看效果</button>
+      ⚠️ 还没接 <b>X 数据源</b>,所以抓不到大V/对标账号的帖子。去「设置 → 🔑 连接」填 <b>Apify Token</b>(或把 X 源切到免费 twscrape),保存即生效。
+      <div className="row" style={{ marginTop: 10, gap: 8 }}>
+        <button className="btn sm" onClick={() => go("settings")}>去设置连接</button>
+        <button className="btn ghost sm" disabled={checking} onClick={runDemo}>🧪 先试跑 demo 看效果</button>
       </div>
     </div>
   );

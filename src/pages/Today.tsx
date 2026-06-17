@@ -16,6 +16,15 @@ function isTodayish(d: Draft) {
   return isToday(d.created) || isToday(d.scheduledAt) || isToday(d.publishedAt);
 }
 
+/** 把 LLM 报错翻成人话(给「再生成」反馈用)。 */
+function friendlyGenErr(msg: string): string {
+  if (/401|authentication|invalid x-api-key|invalid api key/i.test(msg)) return "AI key 无效 · 去设置检查 Anthropic key";
+  if (/429|rate|overloaded/i.test(msg)) return "AI 暂时限流 · 稍后再试";
+  if (/Failed to fetch|NetworkError|load failed/i.test(msg)) return "连不上 anthropic.com · 检查网络";
+  if (/NO_KEY/.test(msg)) return "没填 AI key(走的是 mock 占位文案)";
+  return msg.slice(0, 50);
+}
+
 export default function Today() {
   const data = useData((s) => s.data);
   const setData = useData((s) => s.setData);
@@ -39,6 +48,7 @@ export default function Today() {
     const newDrafts: Draft[] = [];
     let i = 0;
     let made = 0;
+    let fail = 0;
     let err: Error | null = null;
     for (const a of cur.accounts) {
       for (let k = 0; k < (cur.settings.dailyPerAccount || 2); k++) {
@@ -51,20 +61,20 @@ export default function Today() {
           newDrafts.push(d);
         } catch (e: any) {
           err = e;
+          fail++;
         }
       }
     }
-    if (err && !newDrafts.length) {
-      toast("生成失败:" + err.message.slice(0, 40));
-      setGenerating(false);
+    setGenerating(false);
+    if (!newDrafts.length) {
+      toast(err ? "生成失败:" + friendlyGenErr(err.message) : "没生成内容 · 先在「话术与人格」加账号");
       return;
     }
     setData((d) => {
       d.drafts.push(...newDrafts);
       recomputeSim(d.drafts, d.accounts);
     });
-    setGenerating(false);
-    toast("今日内容已生成 ✨");
+    toast(fail ? `生成 ${newDrafts.length} 条 · ${fail} 条失败(${friendlyGenErr(err?.message || "")})` : `生成 ${newDrafts.length} 条 ✨`);
   }
 
   function approvePlat(p: Platform) {

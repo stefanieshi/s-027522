@@ -22,6 +22,7 @@ export default function Settings() {
   const setData = useData((s) => s.setData);
   const replace = useData((s) => s.replace);
   const resetSeed = useData((s) => s.resetSeed);
+  const clearContent = useData((s) => s.clearContent);
   const { toast, go } = useUi();
   const memOnly = !localStorageWorks();
 
@@ -154,11 +155,18 @@ export default function Settings() {
     i.click();
   }
 
-  function reset() {
-    if (confirm("清空并重置为示例?")) {
+  function clearAll() {
+    if (confirm("清空所有内容(账号 / 爆款 / 草稿 / 收件箱)?设置(key、后端地址等)会保留。此操作不可撤销。")) {
+      clearContent();
+      go("today");
+      toast("已清空 · 现在可以加你自己的账号了");
+    }
+  }
+  function loadDemo() {
+    if (confirm("载入一组示例数据(演示用,会覆盖现有内容)?")) {
       resetSeed();
       go("today");
-      toast("已重置");
+      toast("已载入示例数据");
     }
   }
 
@@ -309,8 +317,11 @@ export default function Settings() {
             <button className="btn ghost sm" onClick={importData}>
               导入
             </button>
-            <button className="btn ghost sm" onClick={reset}>
-              清空重置
+            <button className="btn ghost sm" onClick={loadDemo}>
+              载入示例数据
+            </button>
+            <button className="btn ghost sm" onClick={clearAll}>
+              清空所有内容
             </button>
           </div>
           <div className="hint" style={{ marginTop: 10 }}>
