@@ -54,12 +54,12 @@ export interface PulledComment {
 }
 
 /** 抓取类调用统一返回 { data, error }:无后端/无 token/失败时 data 为空,error 给调用方提示。 */
-async function getList<T>(apiBase: string, path: string, body: unknown): Promise<{ data: T[]; error?: string }> {
+async function getList<T>(apiBase: string, path: string, body?: unknown, method: "GET" | "POST" = "POST"): Promise<{ data: T[]; error?: string }> {
   try {
     const res = await fetch(base(apiBase) + path, {
-      method: "POST",
-      headers: { "content-type": "application/json" },
-      body: JSON.stringify(body),
+      method,
+      headers: method === "POST" ? { "content-type": "application/json" } : undefined,
+      body: method === "POST" ? JSON.stringify(body ?? {}) : undefined,
     });
     if (!res.ok) {
       const j = await res.json().catch(() => ({}));
@@ -185,4 +185,88 @@ export async function apiHealth(apiBase: string): Promise<boolean> {
 
 function isNetwork(e: any): boolean {
   return e instanceof TypeError || /Failed to fetch|NetworkError|load failed/i.test(e?.message || "");
+}
+
+/* ===================== 追踪雷达(对标/大V + 大V回复待办 + 灵感) ===================== */
+export interface TrackedAccount {
+  id: string;
+  platform: string;
+  handle: string;
+  kind: "competitor" | "bigv";
+  niche: string | null;
+  replyAccountId: string | null;
+  guideline: string | null;
+  lastChecked: string | null;
+  active: boolean;
+}
+export interface Mention {
+  id: string;
+  platform: Platform;
+  postUrl: string | null;
+  postText: string | null;
+  author: string | null;
+  reply: string | null;
+  flagged: boolean;
+  status: "drafted" | "approved" | "sent" | "ignored";
+  notified: boolean;
+  createdAt: string;
+}
+export interface Inspiration {
+  platform: Platform;
+  source: string | null;
+  raw: string | null;
+  metrics: string | null;
+  url: string | null;
+  topic: string | null;
+  score: number | null;
+}
+
+export const apiListTracked = (apiBase: string, kind?: string) =>
+  getList<TrackedAccount>(apiBase, "/api/tracked" + (kind ? "?kind=" + kind : ""), undefined, "GET");
+
+export async function apiImportTracked(
+  apiBase: string,
+  body: { platform: string; kind: string; handles: string[]; niche?: string; replyAccountId?: string; guideline?: string }
+): Promise<{ added: number } | { error: string }> {
+  try {
+    return await postJSON(base(apiBase) + "/api/tracked/import", body);
+  } catch (e: any) {
+    return { error: isNetwork(e) ? UNREACHABLE : e?.message || String(e) };
+  }
+}
+export async function apiDeleteTracked(apiBase: string, id: string): Promise<boolean> {
+  try {
+    return (await fetch(base(apiBase) + "/api/tracked/" + id, { method: "DELETE" })).ok;
+  } catch {
+    return false;
+  }
+}
+
+export const apiListMentions = (apiBase: string, status?: string) =>
+  getList<Mention>(apiBase, "/api/mentions" + (status ? "?status=" + status : ""), undefined, "GET");
+
+export async function apiMentionAction(apiBase: string, id: string, action: "approve" | "sent" | "ignore"): Promise<boolean> {
+  try {
+    return (await fetch(base(apiBase) + `/api/mentions/${id}/${action}`, { method: "POST" })).ok;
+  } catch {
+    return false;
+  }
+}
+export async function apiMarkMentionsNotified(apiBase: string, ids: string[]): Promise<void> {
+  try {
+    await postJSON(base(apiBase) + "/api/mentions/mark-notified", { ids });
+  } catch {
+    /* best-effort */
+  }
+}
+
+export const apiListInspiration = (apiBase: string, platform?: string) =>
+  getList<Inspiration>(apiBase, "/api/inspiration" + (platform ? "?platform=" + platform : ""), undefined, "GET");
+
+export async function apiRunMonitor(apiBase: string): Promise<{ mentions: number; inspiration: number } | null> {
+  try {
+    return await postJSON(base(apiBase) + "/api/monitor/run", {});
+  } catch {
+    return null;
+  }
 }

@@ -1,13 +1,13 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import TopBar from "../components/TopBar";
 import { useData, useUi } from "../store";
 import { DEFAULT_TYPE, PLAT_LABEL, PLAT_TIME, TYPES } from "../lib/constants";
-import { composerUrl, fmtTime, initial, isToday } from "../lib/utils";
+import { composerUrl, fmtTime, initial, isToday, uid } from "../lib/utils";
 import { generateDraft } from "../lib/llm";
 import { assignSchedule, recomputeSim } from "../lib/schedule";
-import { publishDraftNow, scheduleDraftBackend } from "../lib/actions";
-import { apiTrends, NO_APIFY_TOKEN, UNREACHABLE } from "../lib/api";
-import { queryLabel, queryPlaceholder } from "../components/modals";
+import { publishDraftNow, scheduleDraftBackend, tearSwipe } from "../lib/actions";
+import { apiListInspiration, apiRunMonitor } from "../lib/api";
+import { mockTrendsByPlatform, type TrendItem } from "../lib/mockTrends";
 import type { Account, Draft, Platform, ResultTier, PublishPostOptions } from "../lib/types";
 
 function isTodayish(d: Draft) {
@@ -187,99 +187,116 @@ function PersonaStrip() {
 function TrendsBar({ selected, setSelected }: { selected: string[]; setSelected: (t: string[]) => void }) {
   const useBackend = useData((s) => s.data.settings.useBackend);
   const apiBase = useData((s) => s.data.settings.apiBase);
+  const setData = useData((s) => s.setData);
   const toast = useUi((s) => s.toast);
-  const [open, setOpen] = useState(false);
-  const [platform, setPlatform] = useState<Platform>("tiktok");
-  const [niche, setNiche] = useState("");
+  const [groups, setGroups] = useState<Record<string, TrendItem[]>>(() => mockTrendsByPlatform());
+  const [live, setLive] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [results, setResults] = useState<string[]>([]);
+  const [saved, setSaved] = useState<Record<string, boolean>>({});
 
-  if (!useBackend) return null;
-
-  async function fetchTrends() {
-    if (!niche.trim()) {
-      toast("请输入" + queryLabel(platform));
+  async function load(refresh: boolean) {
+    if (!useBackend) {
+      setGroups(mockTrendsByPlatform());
+      setLive(false);
+      if (refresh) toast("示例热点 · 开启「接后端真发布」+ 加对标账号后变真实");
       return;
     }
     setLoading(true);
-    const { data, error } = await apiTrends(apiBase, platform, niche.trim(), 10);
+    if (refresh) await apiRunMonitor(apiBase);
+    const { data } = await apiListInspiration(apiBase);
     setLoading(false);
-    if (error) {
-      if (error === NO_APIFY_TOKEN) toast("后端未配 APIFY_TOKEN");
-      else if (error === UNREACHABLE) toast("后端未连上");
-      else toast("抓取失败:" + error.slice(0, 40));
-      return;
+    if (data && data.length) {
+      const m: Record<string, TrendItem[]> = {};
+      data.forEach((d) => {
+        const topic = (d.topic || d.raw || "").split("\n")[0].trim().slice(0, 60);
+        if (!topic) return;
+        (m[d.platform] = m[d.platform] || []).push({ platform: d.platform as Platform, topic, score: d.score ?? 0, example: d.raw || topic });
+      });
+      setGroups(m);
+      setLive(true);
+    } else {
+      setGroups(mockTrendsByPlatform());
+      setLive(false);
+      if (refresh) toast("后端暂无灵感 · 配 APIFY_TOKEN + 加对标账号后填充");
     }
-    if (!data.length) toast("没抓到趋势,换个词");
-    setResults(data);
   }
 
-  function toggle(t: string) {
-    setSelected(selected.includes(t) ? selected.filter((x) => x !== t) : [...selected, t]);
+  useEffect(() => {
+    load(false);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [useBackend, apiBase]);
+
+  function toggle(topic: string) {
+    setSelected(selected.includes(topic) ? selected.filter((x) => x !== topic) : [...selected, topic]);
   }
+  function save(it: TrendItem, key: string) {
+    const id = uid();
+    setData((d) => {
+      d.swipes.unshift({ id, platform: it.platform, source: "趋势·" + (it.tag || it.platform), metrics: "🔥" + it.score, raw: it.example || it.topic, teardown: null, pattern: null });
+    });
+    setSaved((s) => ({ ...s, [key]: true }));
+    tearSwipe(id);
+    toast("已存入爆款库 · 拆解中…");
+  }
+
+  const plats = Object.keys(groups);
 
   return (
-    <div className="card" style={{ marginBottom: 16, padding: 14 }}>
-      <div className="row" style={{ justifyContent: "space-between", alignItems: "center" }}>
-        <div>
+    <div className="card" style={{ marginBottom: 16 }}>
+      <div className="row" style={{ justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
+        <div className="row" style={{ alignItems: "center", gap: 9 }}>
           <b className="display" style={{ fontSize: 15 }}>
-            🔥 趋势选题
+            📈 今日趋势 Scout
           </b>
-          <span className="hint" style={{ marginLeft: 8 }}>
-            {selected.length ? `已选 ${selected.length} 个 · 会喂给「生成」` : "抓热点喂给起草,蹭时效"}
-          </span>
+          <span className="pill-s ps-blue">生成时蹭趋势:{selected.length ? "开 (" + selected.length + ")" : "关"}</span>
+          {!live && <span className="pill-s ps-mut">{useBackend ? "示例 · 待后端填充" : "示例"}</span>}
         </div>
-        <button className="btn ghost sm" onClick={() => setOpen((v) => !v)}>
-          {open ? "收起" : "抓趋势"}
+        <button className="btn ghost sm" disabled={loading} onClick={() => load(true)}>
+          {loading ? <span className="spin" /> : "⟳"} 刷新趋势
         </button>
       </div>
 
-      {!!selected.length && (
-        <div className="row" style={{ gap: 6, marginTop: 10 }}>
+      {selected.length > 0 && (
+        <div className="row" style={{ gap: 6, marginBottom: 12 }}>
           {selected.map((t) => (
             <button key={t} className="pill-s ps-brand" style={{ border: "none", cursor: "pointer" }} onClick={() => toggle(t)} title="点掉移除">
-              {t.slice(0, 28)} ✕
+              {t.slice(0, 24)} ✕
             </button>
           ))}
         </div>
       )}
 
-      {open && (
-        <div style={{ marginTop: 12 }}>
-          <div className="row" style={{ gap: 8, alignItems: "flex-end" }}>
-            <label className="fld" style={{ marginBottom: 0 }}>
-              <span className="lab">平台</span>
-              <select className="in" value={platform} onChange={(e) => setPlatform(e.target.value as Platform)}>
-                <option value="tiktok">TikTok(话题)</option>
-                <option value="x">X(@handle)</option>
-                <option value="reddit">Reddit(关键词)</option>
-              </select>
-            </label>
-            <label className="fld" style={{ marginBottom: 0, flex: 1 }}>
-              <span className="lab">{queryLabel(platform)}</span>
-              <input className="in" value={niche} onChange={(e) => setNiche(e.target.value)} onKeyDown={(e) => e.key === "Enter" && fetchTrends()} placeholder={queryPlaceholder(platform)} />
-            </label>
-            <button className="btn sm" disabled={loading} onClick={fetchTrends}>
-              {loading ? <span className="spin" /> : "抓取"}
-            </button>
-          </div>
-          {!!results.length && (
-            <div className="row" style={{ gap: 6, marginTop: 12 }}>
-              {results.map((t) => (
-                <button
-                  key={t}
-                  className={"pill-s " + (selected.includes(t) ? "ps-ready" : "ps-mut")}
-                  style={{ border: "none", cursor: "pointer", textAlign: "left" }}
-                  onClick={() => toggle(t)}
-                >
-                  {selected.includes(t) ? "✓ " : "+ "}
-                  {t.slice(0, 36)}
-                </button>
-              ))}
-            </div>
-          )}
+      {plats.map((p) => (
+        <div key={p} style={{ marginBottom: 10 }}>
+          <span className={"platTag p-" + p} style={{ display: "inline-block", marginBottom: 8 }}>
+            {PLAT_LABEL[p as Platform]}
+          </span>
+          {groups[p].map((it, i) => {
+            const key = p + "-" + i;
+            const sel = selected.includes(it.topic);
+            return (
+              <div className="swrow" key={key} style={{ alignItems: "center", marginBottom: 8 }}>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{ fontWeight: 700, fontSize: 13.5 }}>
+                    {it.topic} {it.tag && <span style={{ color: "var(--blue)" }}>#{it.tag}</span>}
+                  </div>
+                  <div className="hint" style={{ marginTop: 3, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+                    🔥 热度 {it.score} · 示例:{(it.example || "").slice(0, 44)}…
+                  </div>
+                </div>
+                <div className="row" style={{ gap: 7 }}>
+                  <button className={"btn sm " + (sel ? "" : "ghost")} onClick={() => toggle(it.topic)}>
+                    {sel ? "✓ 已选" : "用它生成"}
+                  </button>
+                  <button className="btn ghost sm" disabled={!!saved[key]} onClick={() => save(it, key)}>
+                    {saved[key] ? "✓" : "存入爆款库"}
+                  </button>
+                </div>
+              </div>
+            );
+          })}
         </div>
-      )}
+      ))}
     </div>
   );
 }
