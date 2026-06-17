@@ -4,8 +4,9 @@
  * 归一化成和 apify.ts 一致的形状,调用点(server/monitor)无感。
  */
 import type { ViralCandidate, PulledComment, LatestPost } from "./apify.js";
+import { cfg } from "../config.js";
 
-const BASE = () => (process.env.TWSCRAPE_URL || "http://127.0.0.1:8001").replace(/\/$/, "");
+const BASE = () => (cfg("TWSCRAPE_URL") || "http://127.0.0.1:8001").replace(/\/$/, "");
 
 async function getJSON<T>(path: string): Promise<T> {
   const ctrl = new AbortController();

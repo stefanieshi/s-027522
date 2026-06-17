@@ -355,3 +355,31 @@ export async function apiStatus(apiBase: string): Promise<BackendStatus | null> 
     return null;
   }
 }
+
+export interface MaskedKey { set: boolean; hint: string }
+export interface AppConfig {
+  apify: MaskedKey;
+  zernio: MaskedKey;
+  anthropic: MaskedKey;
+  xSource: string;
+  redditSource: string;
+  twscrapeUrl: string;
+}
+/** 读后端运行期配置(密钥只回掩码)。后端不可达返回 null。 */
+export async function apiGetConfig(apiBase: string): Promise<AppConfig | null> {
+  try {
+    const res = await fetch(base(apiBase) + "/api/config");
+    if (!res.ok) return null;
+    return (await res.json()) as AppConfig;
+  } catch {
+    return null;
+  }
+}
+/** 保存后端配置(只传要改的字段;空串=清除回退 env)。返回新掩码配置或错误。 */
+export async function apiSaveConfig(apiBase: string, patch: Record<string, string>): Promise<AppConfig | { error: string }> {
+  try {
+    return await postJSON<AppConfig>(base(apiBase) + "/api/config", patch);
+  } catch (e: any) {
+    return { error: isNetwork(e) ? UNREACHABLE : e?.message || String(e) };
+  }
+}

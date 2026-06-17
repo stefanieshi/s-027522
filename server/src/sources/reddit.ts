@@ -7,8 +7,9 @@
  * 免费、官方、合法(非商用);带描述性 User-Agent 降被限概率。高频请用官方 OAuth 提限额。
  */
 import type { ViralCandidate, PulledComment, LatestPost } from "./apify.js";
+import { cfg } from "../config.js";
 
-const UA = () => process.env.REDDIT_USER_AGENT || "vibe-marketer/1.0 (read-only research)";
+const UA = () => cfg("REDDIT_USER_AGENT") || "vibe-marketer/1.0 (read-only research)";
 
 async function getJSON<T>(url: string): Promise<T> {
   const ctrl = new AbortController();

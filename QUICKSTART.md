@@ -16,6 +16,9 @@ cd server && npm install && cd ..
 ```
 
 ## 2. 配置后端钥匙
+
+> ✅ **最简单**:先把 app 跑起来(第 3 步),然后在网页 **设置 → 🔑 连接** 里直接填 Apify / Zernio / 后端 Anthropic 的 key,点保存即可生效——**不用改 .env、不用开终端**。下面的 `.env` 方式是给想用文件配置的人。
+
 ```bash
 cp server/.env.example server/.env
 ```

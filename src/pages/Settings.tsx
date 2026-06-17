@@ -1,8 +1,8 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import TopBar from "../components/TopBar";
 import { useData, useUi } from "../store";
 import { MODELS, CHANNELS } from "../lib/constants";
-import { apiHealth, apiRunMonitor } from "../lib/api";
+import { apiHealth, apiRunMonitor, apiGetConfig, apiSaveConfig, type AppConfig } from "../lib/api";
 import { ensurePermission, alertNewMentions } from "../lib/notify";
 import type { AppData, Channel } from "../lib/types";
 
@@ -38,6 +38,39 @@ export default function Settings() {
   const [notifyDesktop, setNotifyDesktop] = useState(settings.notifyDesktop);
   const [testing, setTesting] = useState(false);
   const [checking, setChecking] = useState(false);
+
+  // 后端运行期配置(key 进网页,不必改 .env)
+  const [cfg, setCfg] = useState<AppConfig | null>(null);
+  const [apifyKey, setApifyKey] = useState("");
+  const [zernioKey, setZernioKey] = useState("");
+  const [anthropicKey, setAnthropicKey] = useState("");
+  const [xSource, setXSource] = useState("apify");
+  const [redditSource, setRedditSource] = useState("apify");
+  const [savingCfg, setSavingCfg] = useState(false);
+
+  async function loadCfg() {
+    const c = await apiGetConfig(apiBase.trim());
+    if (c) { setCfg(c); setXSource(c.xSource); setRedditSource(c.redditSource); }
+    else setCfg(null);
+  }
+  useEffect(() => {
+    loadCfg();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [apiBase]);
+
+  async function saveConn() {
+    setSavingCfg(true);
+    const patch: Record<string, string> = { X_SOURCE: xSource, REDDIT_SOURCE: redditSource };
+    if (apifyKey.trim()) patch.APIFY_TOKEN = apifyKey.trim();
+    if (zernioKey.trim()) patch.ZERNIO_API_KEY = zernioKey.trim();
+    if (anthropicKey.trim()) patch.ANTHROPIC_API_KEY = anthropicKey.trim();
+    const r = await apiSaveConfig(apiBase.trim(), patch);
+    setSavingCfg(false);
+    if ((r as any).error) { toast("保存失败 · 确认后端已连上(先在上面「测试连接」)"); return; }
+    setCfg(r as AppConfig);
+    setApifyKey(""); setZernioKey(""); setAnthropicKey("");
+    toast("连接已保存 ✓ 立即生效,不用改 .env");
+  }
 
   function save() {
     setData((d) => {
@@ -189,6 +222,42 @@ export default function Settings() {
           </div>
           <button className="btn ghost sm" disabled={testing} onClick={testConn}>
             {testing ? <span className="spin" /> : "🔌"} 测试连接
+          </button>
+
+          <div className="sect">🔑 连接(数据源 & 发布的 key)</div>
+          <div className="hint" style={{ marginBottom: 10 }}>
+            在这里填 key,**立即生效、不用再改 .env**。key 只存你本机后端、不入库不上传。{cfg ? "" : "(后端没连上时这里读不到状态,先在上面「测试连接」。)"}
+          </div>
+          <label className="fld">
+            <span className="lab">Apify Token{cfg?.apify.set ? `(已配 ${cfg.apify.hint},留空不改)` : "(抓 X/TikTok/IG 帖)"}</span>
+            <input className="in" type="password" value={apifyKey} placeholder={cfg?.apify.set ? "已配置 · 留空保持不变" : "apify_api_…"} onChange={(e) => setApifyKey(e.target.value)} />
+          </label>
+          <label className="fld">
+            <span className="lab">Zernio API Key{cfg?.zernio.set ? `(已配 ${cfg.zernio.hint},留空不改)` : "(自动发布/排期)"}</span>
+            <input className="in" type="password" value={zernioKey} placeholder={cfg?.zernio.set ? "已配置 · 留空保持不变" : "sk_…"} onChange={(e) => setZernioKey(e.target.value)} />
+          </label>
+          <label className="fld">
+            <span className="lab">后端 Anthropic Key{cfg?.anthropic.set ? `(已配 ${cfg.anthropic.hint},留空不改)` : "(大V回复草拟用)"}</span>
+            <input className="in" type="password" value={anthropicKey} placeholder={cfg?.anthropic.set ? "已配置 · 留空保持不变" : "sk-ant-…"} onChange={(e) => setAnthropicKey(e.target.value)} />
+          </label>
+          <div className="grid2">
+            <label className="fld">
+              <span className="lab">X 抓取源</span>
+              <select className="in" value={xSource} onChange={(e) => setXSource(e.target.value)}>
+                <option value="apify">Apify(付费 · 最省事)</option>
+                <option value="twscrape">twscrape(免费 · 需小号)</option>
+              </select>
+            </label>
+            <label className="fld">
+              <span className="lab">Reddit 抓取源</span>
+              <select className="in" value={redditSource} onChange={(e) => setRedditSource(e.target.value)}>
+                <option value="apify">Apify</option>
+                <option value="public">公开接口(免费)</option>
+              </select>
+            </label>
+          </div>
+          <button className="btn sm" disabled={savingCfg} onClick={saveConn}>
+            {savingCfg ? <span className="spin" /> : "💾"} 保存连接
           </button>
 
           <div className="sect">📡 追踪雷达 · 大V监控通知</div>

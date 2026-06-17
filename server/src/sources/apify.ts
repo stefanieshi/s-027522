@@ -8,15 +8,16 @@
  */
 import { xDiscover, xUserLatest, xReplies } from "./x.js";
 import { redditDiscover, redditUserLatest, redditComments } from "./reddit.js";
+import { cfg } from "../config.js";
 
 type Platform = "x" | "tiktok" | "instagram" | "reddit";
 
 export const NO_TOKEN = "NO_APIFY_TOKEN";
 
 /** X 免费源(twscrape)开关:X_SOURCE=twscrape 时,x 平台抓取走 sidecar。 */
-const useTwscrape = () => process.env.X_SOURCE === "twscrape";
+const useTwscrape = () => cfg("X_SOURCE") === "twscrape";
 /** Reddit 免费源开关:REDDIT_SOURCE=public 时,reddit 平台走公开 .json(无需 key)。 */
-const useRedditPublic = () => process.env.REDDIT_SOURCE === "public";
+const useRedditPublic = () => cfg("REDDIT_SOURCE") === "public";
 
 const ACTORS = {
   tiktokHashtag: process.env.APIFY_ACTOR_TIKTOK_HASHTAG || "clockworks/tiktok-hashtag-scraper",
@@ -51,7 +52,7 @@ export interface PulledComment {
 
 /* ---------- low level ---------- */
 async function runActor(actorId: string, input: Record<string, unknown>, maxItems: number): Promise<any[]> {
-  const token = process.env.APIFY_TOKEN;
+  const token = cfg("APIFY_TOKEN");
   if (!token) throw new Error(NO_TOKEN);
   const path = actorId.replace("/", "~"); // acts/<user>~<actor>
   const url = `https://api.apify.com/v2/acts/${path}/run-sync-get-dataset-items?token=${encodeURIComponent(token)}&maxItems=${maxItems}`;
