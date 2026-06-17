@@ -49,7 +49,7 @@ npm run dev:all
 
 ## 用免费数据源(可选,省 Apify 的钱)
 - **Reddit(零成本、最稳)**:`server/.env` 设 `REDDIT_SOURCE=public`,重启即可。官方公开接口,无需账号。
-- **X(免费,需你的小号)**:见 [`server/x-scraper/README.md`](server/x-scraper/README.md) —— 跑一个本地小服务 + 加 X 小号(别用主号),再设 `X_SOURCE=twscrape`。
+- **X(免费,需你的小号)**:见 [`server/x-scraper/README.md`](server/x-scraper/README.md) —— 跑一个本地小服务,设 `X_SOURCE=twscrape`,然后**直接在网页**「话术与人格 → 📡 追踪 → 🐦 X 抓取小号」里加小号(别用主号),不用碰命令行。
 - TikTok / Instagram 暂时仍走 Apify(开源方案不稳,不建议)。
 
 ## 出问题时

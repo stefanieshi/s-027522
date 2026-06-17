@@ -24,7 +24,45 @@ async function getJSON<T>(path: string): Promise<T> {
   }
 }
 
+/** 通用请求(支持 POST/DELETE + 自定义超时);加号/登录较慢,故超时更长。 */
+async function reqJSON<T>(path: string, method: "GET" | "POST" | "DELETE", body?: unknown, timeoutMs = 90_000): Promise<T> {
+  const ctrl = new AbortController();
+  const timer = setTimeout(() => ctrl.abort(), timeoutMs);
+  try {
+    const res = await fetch(BASE() + path, {
+      method,
+      headers: body ? { "content-type": "application/json" } : undefined,
+      body: body ? JSON.stringify(body) : undefined,
+      signal: ctrl.signal,
+    });
+    if (!res.ok) throw new Error(`twscrape ${res.status}: ${(await res.text().catch(() => "")).slice(0, 160)}`);
+    return (await res.json()) as T;
+  } catch (e: any) {
+    if (e?.name === "AbortError" || e instanceof TypeError) {
+      throw new Error("twscrape sidecar 不可达(确认已启动 :8001;cd server/x-scraper && ./run.sh)");
+    }
+    throw e;
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
 const enc = encodeURIComponent;
+
+/* ---------- 小号(burner)账号管理:供前端 UI 调用 ---------- */
+export interface XAccount {
+  username: string;
+  active: boolean;
+  logged_in: boolean;
+  last_used?: string | null;
+  total_req?: number | null;
+  error_msg?: string | null;
+}
+export const xAccountsList = () => reqJSON<XAccount[]>("/accounts", "GET");
+export const xAccountAdd = (body: { username: string; password: string; email: string; email_password: string }) =>
+  reqJSON<{ ok: boolean; username?: string; logged_in?: boolean; login_error?: string | null; error?: string }>("/accounts/add", "POST", body, 150_000);
+export const xAccountsLogin = () => reqJSON<{ total: number; active: number }>("/accounts/login", "POST", undefined, 180_000);
+export const xAccountDelete = (username: string) => reqJSON<{ ok: boolean }>("/accounts/" + enc(username), "DELETE");
 
 /** 发现爆款:@handle → 该账号近期帖;否则关键词搜索。 */
 export async function xDiscover(query: string, limit: number): Promise<ViralCandidate[]> {

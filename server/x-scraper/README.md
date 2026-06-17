@@ -11,13 +11,18 @@ cd server/x-scraper
 python -m venv .venv && source .venv/bin/activate
 pip install -r requirements.txt
 
-# 加小号(账号会存到 accounts.db),登录方式见 twscrape 文档:
-#   每行: username:password:email:email_password
-twscrape add_accounts accounts.txt username:password:email:email_password
-twscrape login_accounts
-
 uvicorn main:app --port 8001
 ```
+
+加小号有两种方式,**任选其一**:
+- **网页里加(推荐,免命令行)**:sidecar 起来后,打开 app 的「话术与人格 → 📡 追踪 → 🐦 X 抓取小号」,
+  填用户名/密码/邮箱/邮箱密码点「添加并登录」即可(凭据只到本机,存进 `accounts.db`)。
+- **命令行加**:
+  ```bash
+  # 每行: username:password:email:email_password
+  twscrape add_accounts accounts.txt username:password:email:email_password
+  twscrape login_accounts
+  ```
 
 ## 让后端用它
 在 `server/.env`:

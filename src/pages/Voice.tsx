@@ -4,7 +4,10 @@ import { useData, useUi } from "../store";
 import { PLAT_LABEL, PLATFORMS } from "../lib/constants";
 import { initial } from "../lib/utils";
 import { tearSwipe } from "../lib/actions";
-import { apiListTracked, apiImportTracked, apiDeleteTracked, UNREACHABLE, type TrackedAccount } from "../lib/api";
+import {
+  apiListTracked, apiImportTracked, apiDeleteTracked, UNREACHABLE, type TrackedAccount,
+  apiListTwscrapeAccounts, apiAddTwscrapeAccount, apiLoginTwscrapeAccounts, apiDeleteTwscrapeAccount, type TwscrapeAccount,
+} from "../lib/api";
 import { AccountModal, SwipeModal, RadarModal } from "../components/modals";
 import type { Platform } from "../lib/types";
 
@@ -91,7 +94,93 @@ function TrackTab() {
       <TrackedList rows={competitors} onDelete={del} loading={loading} />
       <div className="sect">已追踪 · 大V {bigvs.length}</div>
       <TrackedList rows={bigvs} onDelete={del} loading={loading} />
+
+      <div className="sect">🐦 X 抓取小号(免费源)</div>
+      <TwscrapeCard apiBase={apiBase} toast={toast} />
     </>
+  );
+}
+
+/** 在网页里管理免费 X 抓取(twscrape)用的小号 —— 加号/登录/删除,凭据只到本机后端。 */
+function TwscrapeCard({ apiBase, toast }: { apiBase: string; toast: (m: string) => void }) {
+  const [list, setList] = useState<TwscrapeAccount[]>([]);
+  const [status, setStatus] = useState<string>("");
+  const [busy, setBusy] = useState(false);
+  const [f, setF] = useState({ username: "", password: "", email: "", emailPassword: "" });
+  const set = (k: keyof typeof f) => (e: { target: { value: string } }) => setF((p) => ({ ...p, [k]: e.target.value }));
+
+  async function load() {
+    const { data, error } = await apiListTwscrapeAccounts(apiBase);
+    if (error) {
+      setList([]);
+      setStatus(error === UNREACHABLE ? "后端未连上" : "sidecar 未启动 · 在终端 cd server/x-scraper && ./run.sh");
+    } else {
+      setList(data);
+      const active = data.filter((a) => a.active).length;
+      setStatus(`${data.length} 个小号 · ${active} 个可用` + (data.length && !active ? "(都未登录,点「重新登录」)" : ""));
+    }
+  }
+  useEffect(() => {
+    load();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [apiBase]);
+
+  async function add() {
+    if (!f.username || !f.password || !f.email || !f.emailPassword) return toast("用户名/密码/邮箱/邮箱密码都要填");
+    setBusy(true);
+    const r = await apiAddTwscrapeAccount(apiBase, f);
+    setBusy(false);
+    if (r.error) return toast(r.error === UNREACHABLE ? "后端未连上 · 确认 npm run dev:all" : "添加失败:" + r.error.slice(0, 60));
+    if (r.ok === false) return toast("添加失败:" + (r as any).error?.slice?.(0, 60));
+    toast(r.logged_in ? "已添加并登录 ✅" : "已添加,但登录未成功:" + ((r.login_error || "").slice(0, 50) || "稍后点重新登录"));
+    setF({ username: "", password: "", email: "", emailPassword: "" });
+    load();
+  }
+  async function relogin() {
+    setBusy(true);
+    const r = await apiLoginTwscrapeAccounts(apiBase);
+    setBusy(false);
+    if (r.error) return toast("登录失败:" + r.error.slice(0, 60));
+    toast(`登录完成 · ${r.active}/${r.total} 可用`);
+    load();
+  }
+  async function del(username: string) {
+    if (!confirm(`删除小号 @${username}?`)) return;
+    if (await apiDeleteTwscrapeAccount(apiBase, username)) { toast("已删除"); load(); }
+    else toast("删除失败");
+  }
+
+  return (
+    <div className="card">
+      <div className="banner" style={{ marginTop: 0 }}>
+        ⚠️ 只用 <b>小号</b>(burner),别用主号。凭据只发到你<b>本机</b>后端、存进 sidecar 的 <code>accounts.db</code>,<b>不入库、不上传</b>。
+        需先在终端起 sidecar(<code>cd server/x-scraper && ./run.sh</code>)并在 <code>server/.env</code> 设 <code>X_SOURCE=twscrape</code>;建议配代理(见 x-scraper/README)。
+      </div>
+      <div className="row" style={{ gap: 8, margin: "4px 0 10px", color: "var(--ink-soft)" }}>
+        状态:{status || "检查中…"} <button className="btn ghost sm" disabled={busy} onClick={relogin} style={{ marginLeft: "auto" }}>重新登录</button>
+      </div>
+      <div className="grid2">
+        <label className="fld"><span className="lab">用户名(@handle)</span><input className="in" value={f.username} onChange={set("username")} placeholder="burner_handle" /></label>
+        <label className="fld"><span className="lab">密码</span><input className="in" type="password" value={f.password} onChange={set("password")} /></label>
+        <label className="fld"><span className="lab">邮箱</span><input className="in" value={f.email} onChange={set("email")} placeholder="burner@mail.com" /></label>
+        <label className="fld"><span className="lab">邮箱密码(或应用专用密码)</span><input className="in" type="password" value={f.emailPassword} onChange={set("emailPassword")} /></label>
+      </div>
+      <div className="mfoot" style={{ marginTop: 8 }}>
+        <button className="btn" disabled={busy} onClick={add}>{busy ? "处理中…" : "添加并登录"}</button>
+      </div>
+      {list.length > 0 && (
+        <div style={{ marginTop: 10 }}>
+          {list.map((a) => (
+            <div className="row" key={a.username} style={{ gap: 8, padding: "4px 0", alignItems: "center" }}>
+              <span className="pill-s">@{a.username}</span>
+              <span style={{ color: a.active ? "var(--ok, green)" : "var(--bad, #c0392b)" }}>{a.active ? "可用" : a.error_msg ? "出错" : "未登录"}</span>
+              {a.error_msg && <span style={{ color: "var(--ink-soft)", fontSize: 12 }}>{String(a.error_msg).slice(0, 40)}</span>}
+              <button className="btn ghost sm" style={{ marginLeft: "auto" }} onClick={() => del(a.username)}>删除</button>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
   );
 }
 
