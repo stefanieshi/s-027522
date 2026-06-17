@@ -34,3 +34,9 @@ pnpm-debug.log*
 
 # tsc incremental build info
 *.tsbuildinfo
+
+# python
+__pycache__/
+*.pyc
+.venv/
+server/x-scraper/accounts.db*
