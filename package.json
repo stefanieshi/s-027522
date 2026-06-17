@@ -6,6 +6,7 @@
   "description": "Vibe Marketer — 多账号社媒增长小助手(前端)。AI 起草、人工把守发布。",
   "scripts": {
     "dev": "vite",
+    "dev:all": "bash dev.sh",
     "build": "tsc -b && vite build",
     "preview": "vite preview",
     "lint": "eslint ."

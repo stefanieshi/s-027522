@@ -1,67 +1,39 @@
 /**
  * scheduler.ts — 常驻调度器(BUILD 指南第 ④ 步)
- * 用 node-cron 每分钟扫一遍 status=scheduled 且 scheduledFor<=now 的帖,
- * 调 publish() 用 zernio 渠道发出,成功后更新状态并存 externalPostId。
- *
- * 这里用一个内存版 store 占位,接 SQLite(better-sqlite3)后把
- * `loadDueScheduled` / `markPublished` / `markFailed` 换成真实 DB 读写即可。
+ * node-cron 每分钟扫 DB 里 status='scheduled' 且 scheduled_for<=now 的帖,
+ * 调 publish() 用该帖记录的渠道(默认 zernio)发出,成功后写回 status +
+ * external_post_id,失败写回 error。
  */
-import cron from 'node-cron';
-import { publish, type PublishInput } from './publishers.js';
+import cron from "node-cron";
+import { publish } from "./publishers.js";
+import { getDueScheduled, markPublished, markFailed, rowToInput, trackMetric } from "./db.js";
 
-export interface ScheduledPost {
-  id: string;
-  input: PublishInput;
-  scheduledFor: string; // ISO
-  status: 'scheduled' | 'published' | 'error';
-  externalPostId?: string;
-  error?: string;
-}
-
-/* ----- 占位内存 store(换成 db.ts 的 SQLite 实现)----- */
-const queue: ScheduledPost[] = [];
-
-export function enqueue(post: ScheduledPost) {
-  queue.push(post);
-}
-
-function loadDueScheduled(now: number): ScheduledPost[] {
-  return queue.filter((p) => p.status === 'scheduled' && new Date(p.scheduledFor).getTime() <= now);
-}
-
-function markPublished(id: string, externalPostId?: string) {
-  const p = queue.find((x) => x.id === id);
-  if (p) {
-    p.status = 'published';
-    p.externalPostId = externalPostId;
-  }
-}
-
-function markFailed(id: string, error: string) {
-  const p = queue.find((x) => x.id === id);
-  if (p) {
-    p.status = 'error';
-    p.error = error;
-  }
-}
+let running = false; // guard against overlapping ticks
 
 async function tick() {
-  const due = loadDueScheduled(Date.now());
-  for (const post of due) {
-    const result = await publish(post.input, 'zernio');
-    if (result.status === 'published' || result.status === 'scheduled') {
-      markPublished(post.id, result.externalPostId);
-      console.log(`[scheduler] published ${post.id} → ${result.externalPostId ?? '(no id)'}`);
-    } else {
-      markFailed(post.id, result.error || 'unknown');
-      console.warn(`[scheduler] failed ${post.id}: ${result.error}`);
+  if (running) return;
+  running = true;
+  try {
+    const due = getDueScheduled(new Date().toISOString());
+    for (const row of due) {
+      const result = await publish(rowToInput(row), row.channel);
+      if (result.status === "published" || result.status === "scheduled" || result.status === "manual") {
+        markPublished(row.id, result.externalPostId);
+        if (result.externalPostId) trackMetric(result.externalPostId, row.account_id, row.platform);
+        console.log(`[scheduler] published ${row.id} (${row.platform}) → ${result.externalPostId ?? result.status}`);
+      } else {
+        markFailed(row.id, result.error || "unknown");
+        console.warn(`[scheduler] failed ${row.id}: ${result.error}`);
+      }
     }
+  } finally {
+    running = false;
   }
 }
 
 export function startScheduler() {
-  cron.schedule('* * * * *', () => {
-    tick().catch((e) => console.error('[scheduler] tick error', e));
+  cron.schedule("* * * * *", () => {
+    tick().catch((e) => console.error("[scheduler] tick error", e));
   });
-  console.log('[scheduler] running — scanning scheduled posts every minute');
+  console.log("[scheduler] running — scanning DB for due scheduled posts every minute");
 }

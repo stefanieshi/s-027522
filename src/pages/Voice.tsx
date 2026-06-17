@@ -4,7 +4,7 @@ import { useData, useUi } from "../store";
 import { PLAT_LABEL } from "../lib/constants";
 import { initial } from "../lib/utils";
 import { tearSwipe } from "../lib/actions";
-import { AccountModal, SwipeModal } from "../components/modals";
+import { AccountModal, SwipeModal, RadarModal } from "../components/modals";
 
 export default function Voice() {
   const voiceTab = useUi((s) => s.voiceTab);
@@ -132,6 +132,7 @@ function TemplateTab() {
 function SwipeTab() {
   const swipes = useData((s) => s.data.swipes);
   const setData = useData((s) => s.setData);
+  const useBackend = useData((s) => s.data.settings.useBackend);
   const openModal = useUi((s) => s.openModal);
 
   function del(id: string) {
@@ -144,6 +145,11 @@ function SwipeTab() {
         <button className="btn" onClick={() => openModal(<SwipeModal />)}>
           ＋ 收藏爆款
         </button>
+        {useBackend && (
+          <button className="btn ghost" onClick={() => openModal(<RadarModal />)}>
+            🔭 爆款雷达
+          </button>
+        )}
       </div>
       <div className="hint" style={{ marginBottom: 12 }}>
         收藏的爆款会被拆解成可复用 pattern,自动生成内容时轮流套用(只用结构、不抄原文)。

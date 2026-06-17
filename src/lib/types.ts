@@ -16,7 +16,11 @@ export interface Account {
   platform: Platform;
   color: string;
   persona: Persona;
+  /** zernio 的 account_id 或 morelogin 的 profile/uniqueId(真发布时用)。 */
+  externalId?: string;
 }
+
+export type Channel = "manual" | "zernio" | "morelogin";
 
 export interface Teardown {
   hook_type: string;
@@ -64,6 +68,27 @@ export interface Draft {
   status: DraftStatus;
   created: number;
   publishedAt?: number;
+  /** 真发布后回填:zernio/morelogin 的帖 id。 */
+  externalPostId?: string;
+  /** 已交后端排期时回填:DB 里 scheduled_posts.id。 */
+  scheduleId?: string;
+  /** 真实互动数据(后端 zernioAnalytics 回收)。 */
+  metrics?: { views: number | null; likes: number | null; engagementRate: number | null; fetchedAt: string | null };
+  /** 媒体附件(TikTok/IG 等媒体平台必需)。 */
+  mediaUrls?: string[];
+  /** 平台专属发布选项(来自 repo1)。 */
+  options?: PublishPostOptions;
+  /** 真发布后的帖子链接。 */
+  publishedUrl?: string;
+}
+
+export interface PublishPostOptions {
+  privacy?: string;
+  disableComment?: boolean;
+  disableDuet?: boolean;
+  disableStitch?: boolean;
+  madeForKids?: boolean;
+  categoryId?: string;
 }
 
 export interface InboxItem {
@@ -91,6 +116,10 @@ export interface Settings {
   minGapMin: number;
   dailyPerAccount: number;
   autoReply: boolean;
+  /** 接后端真发布:开了才走 /api/publish、/api/schedule;关了走本地/mock。 */
+  useBackend: boolean;
+  apiBase: string;
+  channel: Channel;
 }
 
 export interface AppData {

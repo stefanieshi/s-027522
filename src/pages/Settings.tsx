@@ -1,8 +1,9 @@
 import { useState } from "react";
 import TopBar from "../components/TopBar";
 import { useData, useUi } from "../store";
-import { MODELS } from "../lib/constants";
-import type { AppData } from "../lib/types";
+import { MODELS, CHANNELS } from "../lib/constants";
+import { apiHealth } from "../lib/api";
+import type { AppData, Channel } from "../lib/types";
 
 function localStorageWorks(): boolean {
   try {
@@ -30,6 +31,10 @@ export default function Settings() {
   const [end, setEnd] = useState(String(settings.postEndHour));
   const [gap, setGap] = useState(String(settings.minGapMin));
   const [sim, setSim] = useState(settings.simThreshold);
+  const [useBackend, setUseBackend] = useState(settings.useBackend);
+  const [apiBase, setApiBase] = useState(settings.apiBase);
+  const [channel, setChannel] = useState<Channel>(settings.channel);
+  const [testing, setTesting] = useState(false);
 
   function save() {
     setData((d) => {
@@ -41,8 +46,18 @@ export default function Settings() {
       s.postEndHour = Math.max(1, Math.min(24, parseInt(end) || 22));
       s.minGapMin = Math.max(10, parseInt(gap) || 45);
       s.simThreshold = sim;
+      s.useBackend = useBackend;
+      s.apiBase = apiBase.trim();
+      s.channel = channel;
     });
     toast("设置已保存");
+  }
+
+  async function testConn() {
+    setTesting(true);
+    const ok = await apiHealth(apiBase.trim());
+    setTesting(false);
+    toast(ok ? "后端连上了 ✓ " + apiBase.trim() : "连不上 · 确认后端已 npm run dev");
   }
 
   function exportData() {
@@ -116,6 +131,36 @@ export default function Settings() {
           <div className="hint" style={{ marginBottom: 6 }}>
             <b>安全</b>:key 只存本地浏览器,只直发 anthropic.com。(生产环境应改走后端代理,见 BUILD-WITH-CLAUDE-CODE.md)
           </div>
+
+          <div className="sect">后端真发布</div>
+          <label className="toggle" style={{ marginBottom: 12 }} onClick={() => setUseBackend((v) => !v)}>
+            接后端真发布 <span className={"sw" + (useBackend ? " on" : "")} />
+          </label>
+          <div className="hint" style={{ marginBottom: 12 }}>
+            关:发布动作只在本地标记 / 打开原生发送框(mock 友好)。开:走后端 <b>/api/publish</b>、X 帖批准走 <b>/api/schedule</b>。
+          </div>
+          <div className="grid2">
+            <label className="fld">
+              <span className="lab">后端地址</span>
+              <input className="in" value={apiBase} placeholder="http://localhost:8787" onChange={(e) => setApiBase(e.target.value)} />
+            </label>
+            <label className="fld">
+              <span className="lab">发布渠道</span>
+              <select className="in" value={channel} onChange={(e) => setChannel(e.target.value as Channel)}>
+                {CHANNELS.map((c) => (
+                  <option key={c.value} value={c.value}>
+                    {c.label}
+                  </option>
+                ))}
+              </select>
+            </label>
+          </div>
+          <div className="hint" style={{ marginBottom: 10 }}>
+            {CHANNELS.find((c) => c.value === channel)?.hint} · <b>reply / DM 永远强制 manual</b>(防封红线,后端写死)。
+          </div>
+          <button className="btn ghost sm" disabled={testing} onClick={testConn}>
+            {testing ? <span className="spin" /> : "🔌"} 测试连接
+          </button>
 
           <div className="sect">时间设置 · X 帖错峰防封</div>
           <div className="grid2">

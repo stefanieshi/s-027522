@@ -34,6 +34,12 @@ export const AV = ["#E8553D", "#4F6EF2", "#2FA36B", "#B5840F", "#7A4FB5", "#0E74
 
 export const MODELS = ["claude-sonnet-4-6", "claude-opus-4-8", "claude-haiku-4-5-20251001"];
 
+export const CHANNELS: { value: "manual" | "zernio" | "morelogin"; label: string; hint: string }[] = [
+  { value: "manual", label: "manual · 人工按发(最安全)", hint: "后端只返回原生发送框 deeplink,你按发送" },
+  { value: "zernio", label: "zernio · 官方 API(原创帖+排期)", hint: "需 ZERNIO_API_KEY;适合原创帖自动发/排期" },
+  { value: "morelogin", label: "morelogin · 指纹浏览器(矩阵号)", hint: "需本机 MoreLogin 客户端 + Playwright" },
+];
+
 export const META: Record<ViewId, { eb: string; t: string; d: string }> = {
   today: {
     eb: "近 30 天热门内容驱动",
