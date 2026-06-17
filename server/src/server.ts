@@ -10,7 +10,7 @@
 import 'dotenv/config';
 import express from 'express';
 import cors from 'cors';
-import { publish, zernioAnalytics, type PublishInput, type Channel } from './publishers.js';
+import { publish, zernioAnalytics, zernioListAccounts, type PublishInput, type Channel } from './publishers.js';
 import { startScheduler } from './scheduler.js';
 import { startAnalyticsRefresher, refreshAll } from './analytics.js';
 import { insertScheduled, listScheduled, cancelScheduled, trackMetric, getMetrics, type SchedStatus, type MetricRow } from './db.js';
@@ -67,6 +67,15 @@ app.delete('/api/schedule/:id', (req, res) => {
 app.get('/api/analytics/:postId', async (req, res) => {
   try {
     res.json(await zernioAnalytics(req.params.postId));
+  } catch (e: any) {
+    res.status(500).json({ error: e?.message || String(e) });
+  }
+});
+
+/* 列出 zernio 已连接账号:前端据此把"内部账号 → zernio accountId"对应起来 */
+app.get('/api/zernio/accounts', async (_req, res) => {
+  try {
+    res.json(await zernioListAccounts());
   } catch (e: any) {
     res.status(500).json({ error: e?.message || String(e) });
   }

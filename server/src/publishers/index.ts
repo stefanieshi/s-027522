@@ -9,11 +9,11 @@
  */
 import type { Channel, Publisher, PublishInput, PublishResult, ActionKind } from "./types.js";
 import { manualPublisher } from "./manual.js";
-import { zernioPublisher, zernioAnalytics } from "./zernio.js";
+import { zernioPublisher, zernioAnalytics, zernioListAccounts } from "./zernio.js";
 import { moreloginPublisher } from "./morelogin.js";
 
 export * from "./types.js";
-export { zernioAnalytics };
+export { zernioAnalytics, zernioListAccounts };
 
 const REGISTRY: Record<Channel, Publisher> = {
   manual: manualPublisher,
