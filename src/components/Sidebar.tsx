@@ -17,7 +17,7 @@ export default function Sidebar() {
   const radarCount = useUi((s) => s.radarCount);
   const data = useData((s) => s.data);
 
-  const ibCount = data.inbox.filter((m) => m.status === "new" || (m.reply && m.status !== "sent")).length + radarCount;
+  const ibCount = data.inbox.filter((m) => m.status === "new" || (m.reply && m.status !== "sent")).length;
   const hasKey = data.settings.apiKey.trim().length > 0;
   const runStatus = hasKey ? "运行正常 · Claude " + data.settings.model.replace("claude-", "") : "运行正常 · mock 模式";
 
