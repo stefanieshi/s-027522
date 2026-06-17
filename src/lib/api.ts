@@ -131,6 +131,29 @@ export async function apiCancelSchedule(apiBase: string, id: string): Promise<bo
   }
 }
 
+export interface ZernioAccount {
+  id: string;
+  platform: string;
+  username?: string;
+  displayName?: string;
+  profileUrl?: string;
+  isActive?: boolean;
+}
+
+/** 列出 zernio 已连接账号(后端读 ZERNIO_API_KEY);用于把内部账号映射到 zernio accountId。 */
+export async function apiZernioAccounts(apiBase: string): Promise<{ data: ZernioAccount[]; error?: string }> {
+  try {
+    const res = await fetch(base(apiBase) + "/api/zernio/accounts");
+    if (!res.ok) {
+      const j = await res.json().catch(() => ({}));
+      return { data: [], error: (j as any)?.error || "HTTP " + res.status };
+    }
+    return { data: (await res.json()) as ZernioAccount[] };
+  } catch (e: any) {
+    return { data: [], error: isNetwork(e) ? UNREACHABLE : e?.message || String(e) };
+  }
+}
+
 /* ===================== 真实互动数据 ===================== */
 export interface Metric {
   externalPostId: string;

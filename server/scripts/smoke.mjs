@@ -112,6 +112,29 @@ async function testPlatform(platform) {
   }
 }
 
+async function probeZernio() {
+  console.log(`\n${C.y}● zernio(发布/排期)${C.x}`);
+  try {
+    const res = await fetch(API_BASE + "/api/zernio/accounts");
+    const j = await res.json().catch(() => ({}));
+    if (res.status === 200 && Array.isArray(j)) {
+      ok(`已连接 ${j.length} 个 zernio 账号`);
+      j.slice(0, 5).forEach((a) => info(`${a.platform}/${a.username || a.displayName || a.id}  id=${a.id}${a.isActive === false ? " (未激活)" : ""}`));
+      if (!j.length) info("⚠ 0 个 → 去 zernio 控制台连接社媒账号");
+    } else {
+      const err = String(j.error || "");
+      if (/未配置|ZERNIO_API_KEY/.test(err)) info("未配 ZERNIO_API_KEY → 只能 manual 人工发;要真发/排期就在 server/.env 填一个");
+      else {
+        failures++;
+        bad(`/api/zernio/accounts [${res.status}] ${err.slice(0, 80)}`);
+      }
+    }
+  } catch {
+    failures++;
+    bad("zernio 检查异常(后端可能没在跑)");
+  }
+}
+
 async function main() {
   console.log(`${C.y}vibe 免费源冒烟测试${C.x}  →  ${API_BASE}  [${PLATFORMS.join(", ")}]`);
   // 后端存活检查
@@ -125,6 +148,7 @@ async function main() {
   }
 
   await probeSidecar();
+  await probeZernio();
   for (const p of PLATFORMS) await testPlatform(p);
 
   console.log("");
