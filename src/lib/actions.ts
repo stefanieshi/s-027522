@@ -16,6 +16,8 @@ function draftInput(d: Draft, acct?: Account): PublishInput {
     platform: d.platform,
     kind: "post",
     text: draftText(d),
+    ...(d.mediaUrls?.length ? { mediaUrls: d.mediaUrls } : {}),
+    ...(d.options ? { options: d.options } : {}),
   };
 }
 
@@ -26,13 +28,14 @@ export async function publishDraftNow(id: string): Promise<void> {
   if (!d) return;
   const acct = data.accounts.find((a) => a.id === d.account_id);
   const s = data.settings;
-  const markPublished = (externalPostId?: string) =>
+  const markPublished = (externalPostId?: string, publishedUrl?: string) =>
     useData.getState().setData((dd) => {
       const t = dd.drafts.find((x) => x.id === id);
       if (t) {
         t.status = "published";
         t.publishedAt = Date.now();
         if (externalPostId) t.externalPostId = externalPostId;
+        if (publishedUrl) t.publishedUrl = publishedUrl;
       }
     });
 
@@ -48,7 +51,7 @@ export async function publishDraftNow(id: string): Promise<void> {
     markPublished();
     toast("已打开原生发送框 · 按发送即可");
   } else if (r.status === "published" || r.status === "scheduled") {
-    markPublished(r.externalPostId);
+    markPublished(r.externalPostId, r.publishedUrl);
     if (r.externalPostId) void apiTrack(s.apiBase, r.externalPostId, d.account_id, d.platform);
     toast("已通过 " + s.channel + " 发布 ✓");
   } else if (r.error === UNREACHABLE) {

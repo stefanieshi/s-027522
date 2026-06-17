@@ -74,6 +74,21 @@ export interface Draft {
   scheduleId?: string;
   /** 真实互动数据(后端 zernioAnalytics 回收)。 */
   metrics?: { views: number | null; likes: number | null; engagementRate: number | null; fetchedAt: string | null };
+  /** 媒体附件(TikTok/IG 等媒体平台必需)。 */
+  mediaUrls?: string[];
+  /** 平台专属发布选项(来自 repo1)。 */
+  options?: PublishPostOptions;
+  /** 真发布后的帖子链接。 */
+  publishedUrl?: string;
+}
+
+export interface PublishPostOptions {
+  privacy?: string;
+  disableComment?: boolean;
+  disableDuet?: boolean;
+  disableStitch?: boolean;
+  madeForKids?: boolean;
+  categoryId?: string;
 }
 
 export interface InboxItem {

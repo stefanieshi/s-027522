@@ -5,7 +5,7 @@ import { PLAT_LABEL } from "../lib/constants";
 import { initial } from "../lib/utils";
 import { generateReply } from "../lib/llm";
 import { sendInboxReply } from "../lib/actions";
-import { InboxAddModal } from "../components/modals";
+import { InboxAddModal, PullInboxModal } from "../components/modals";
 import type { InboxItem } from "../lib/types";
 
 export default function Inbox() {
@@ -91,6 +91,11 @@ export default function Inbox() {
           <button className="btn" disabled={genningAll} onClick={genAll}>
             {genningAll ? <span className="spin" /> : "✨"} 一键生成所有回复
           </button>
+          {data.settings.useBackend && (
+            <button className="btn ghost" onClick={() => openModal(<PullInboxModal />)}>
+              ⬇️ 拉取互动
+            </button>
+          )}
           <button className="btn ghost" onClick={() => openModal(<InboxAddModal />)}>
             + 加一条消息
           </button>

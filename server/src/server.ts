@@ -14,6 +14,7 @@ import { publish, zernioAnalytics, type PublishInput, type Channel } from './pub
 import { startScheduler } from './scheduler.js';
 import { startAnalyticsRefresher, refreshAll } from './analytics.js';
 import { insertScheduled, listScheduled, cancelScheduled, trackMetric, getMetrics, type SchedStatus, type MetricRow } from './db.js';
+import { discoverViral, pullComments, fetchTrends, NO_TOKEN } from './sources/apify.js';
 
 const app = express();
 app.use(cors({ origin: process.env.FRONTEND_ORIGIN || '*' }));
@@ -92,6 +93,42 @@ app.get('/api/metrics', (req, res) => {
 
 app.post('/api/metrics/refresh', async (_req, res) => {
   res.json(await refreshAll());
+});
+
+/* ===== 抓取摄入(Apify):爆款雷达 / 真收件箱 / 趋势选题 ===== */
+function apifyError(res: express.Response, e: any) {
+  if (e?.message === NO_TOKEN) return res.status(400).json({ error: NO_TOKEN });
+  return res.status(500).json({ error: e?.message || String(e) });
+}
+
+app.post('/api/discover', async (req, res) => {
+  const { platform, query, limit } = req.body as { platform: string; query: string; limit?: number };
+  if (!platform || !query) return res.status(400).json({ error: '缺少 platform / query' });
+  try {
+    res.json(await discoverViral({ platform: platform as any, query, limit }));
+  } catch (e) {
+    apifyError(res, e);
+  }
+});
+
+app.post('/api/inbox/pull', async (req, res) => {
+  const { platform, postUrls, limit } = req.body as { platform: string; postUrls: string[]; limit?: number };
+  if (!platform || !postUrls?.length) return res.status(400).json({ error: '缺少 platform / postUrls' });
+  try {
+    res.json(await pullComments({ platform: platform as any, postUrls, limit }));
+  } catch (e) {
+    apifyError(res, e);
+  }
+});
+
+app.post('/api/trends', async (req, res) => {
+  const { platform, query, limit } = req.body as { platform: string; query: string; limit?: number };
+  if (!platform || !query) return res.status(400).json({ error: '缺少 platform / query' });
+  try {
+    res.json(await fetchTrends({ platform: platform as any, query, limit }));
+  } catch (e) {
+    apifyError(res, e);
+  }
 });
 
 const port = Number(process.env.PORT) || 8787;

@@ -25,12 +25,18 @@ async function zernioPublish(i: PublishInput): Promise<PublishResult> {
       content: i.text,
       platforms: [{ platform: ZERNIO_PLATFORM[i.platform], accountId: i.externalAccountId }],
       ...(i.mediaUrls?.length ? { mediaUrls: i.mediaUrls } : {}),
+      // 平台专属选项尽力透传(真 key 时按 zernio 文档校准字段名)
+      ...(i.options ? { options: i.options } : {}),
     };
     if (i.scheduledFor) body.scheduledFor = i.scheduledFor;
     else body.publishNow = true;
 
     const { data } = await zernio.posts.createPost({ body: body as any });
-    return { status: i.scheduledFor ? "scheduled" : "published", externalPostId: (data as any)?.id };
+    return {
+      status: i.scheduledFor ? "scheduled" : "published",
+      externalPostId: (data as any)?.id,
+      publishedUrl: (data as any)?.url ?? (data as any)?.postUrl,
+    };
   } catch (e: any) {
     return { status: "error", error: e?.message || String(e) };
   }

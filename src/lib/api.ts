@@ -8,6 +8,15 @@ import type { Platform } from "./types";
 export type Channel = "manual" | "zernio" | "morelogin";
 export type ActionKind = "post" | "reply" | "dm";
 
+export interface PublishOptions {
+  privacy?: string;
+  disableComment?: boolean;
+  disableDuet?: boolean;
+  disableStitch?: boolean;
+  madeForKids?: boolean;
+  categoryId?: string;
+}
+
 export interface PublishInput {
   accountId: string;
   externalAccountId?: string;
@@ -17,14 +26,59 @@ export interface PublishInput {
   mediaUrls?: string[];
   scheduledFor?: string;
   targetUrl?: string;
+  options?: PublishOptions;
 }
 
 export interface PublishResult {
   status: "published" | "scheduled" | "manual" | "error";
   externalPostId?: string;
+  publishedUrl?: string;
   openUrl?: string;
   error?: string;
 }
+
+/* ===================== 抓取摄入(Apify)===================== */
+export const NO_APIFY_TOKEN = "NO_APIFY_TOKEN";
+
+export interface ViralCandidate {
+  platform: Platform;
+  source: string;
+  raw: string;
+  metrics: string;
+  url: string;
+}
+export interface PulledComment {
+  platform: Platform;
+  from: string;
+  msg: string;
+}
+
+/** 抓取类调用统一返回 { data, error }:无后端/无 token/失败时 data 为空,error 给调用方提示。 */
+async function getList<T>(apiBase: string, path: string, body: unknown): Promise<{ data: T[]; error?: string }> {
+  try {
+    const res = await fetch(base(apiBase) + path, {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify(body),
+    });
+    if (!res.ok) {
+      const j = await res.json().catch(() => ({}));
+      return { data: [], error: (j as any)?.error || "HTTP " + res.status };
+    }
+    return { data: (await res.json()) as T[] };
+  } catch (e: any) {
+    return { data: [], error: isNetwork(e) ? UNREACHABLE : e?.message || String(e) };
+  }
+}
+
+export const apiDiscover = (apiBase: string, platform: string, query: string, limit = 8) =>
+  getList<ViralCandidate>(apiBase, "/api/discover", { platform, query, limit });
+
+export const apiPullInbox = (apiBase: string, platform: string, postUrls: string[], limit = 20) =>
+  getList<PulledComment>(apiBase, "/api/inbox/pull", { platform, postUrls, limit });
+
+export const apiTrends = (apiBase: string, platform: string, query: string, limit = 10) =>
+  getList<string>(apiBase, "/api/trends", { platform, query, limit });
 
 export const UNREACHABLE = "BACKEND_UNREACHABLE";
 

@@ -16,11 +16,23 @@ export interface PublishInput {
   mediaUrls?: string[];
   scheduledFor?: string; // ISO 时间;给了就排期,不给就立即发
   targetUrl?: string; // reply 用:被回复的推文 URL
+  options?: PublishOptions; // 平台专属发布选项(来自 repo1)
+}
+
+/** 平台专属发布选项。TikTok:privacy 与 disable 系列;YouTube:madeForKids、categoryId。 */
+export interface PublishOptions {
+  privacy?: string;
+  disableComment?: boolean;
+  disableDuet?: boolean;
+  disableStitch?: boolean;
+  madeForKids?: boolean;
+  categoryId?: string;
 }
 
 export interface PublishResult {
   status: "published" | "scheduled" | "manual" | "error";
   externalPostId?: string;
+  publishedUrl?: string; // 真发布后的帖子链接(若供应商返回)
   openUrl?: string; // manual 渠道:原生发送框 deeplink
   error?: string;
 }

@@ -6,7 +6,8 @@ import { composerUrl, fmtTime, initial, isToday } from "../lib/utils";
 import { generateDraft } from "../lib/llm";
 import { assignSchedule, recomputeSim } from "../lib/schedule";
 import { publishDraftNow, scheduleDraftBackend } from "../lib/actions";
-import type { Account, Draft, Platform, ResultTier } from "../lib/types";
+import { apiTrends, NO_APIFY_TOKEN, UNREACHABLE } from "../lib/api";
+import type { Account, Draft, Platform, ResultTier, PublishPostOptions } from "../lib/types";
 
 function isTodayish(d: Draft) {
   return isToday(d.created) || isToday(d.scheduledAt) || isToday(d.publishedAt);
@@ -18,6 +19,7 @@ export default function Today() {
   const { toast, setExpanded } = useUi();
   const [showTag, setShowTag] = useState(false);
   const [generating, setGenerating] = useState(false);
+  const [seedTopics, setSeedTopics] = useState<string[]>([]);
 
   const acctOf = (id: string) => data.accounts.find((a) => a.id === id);
   const pending = data.drafts.filter((d) => d.status === "pending");
@@ -31,12 +33,15 @@ export default function Today() {
     const pats = cur.swipes.filter((s) => s.teardown);
     const newDrafts: Draft[] = [];
     let i = 0;
+    let made = 0;
     let err: Error | null = null;
     for (const a of cur.accounts) {
       for (let k = 0; k < (cur.settings.dailyPerAccount || 2); k++) {
         const pat = pats.length ? pats[i++ % pats.length] : null;
+        const topic = seedTopics.length ? seedTopics[made % seedTopics.length] : "";
+        made++;
         try {
-          const d = await generateDraft(cur.settings, [...cur.drafts, ...newDrafts], a, DEFAULT_TYPE[a.platform], "", pat ? pat.pattern!.template : "");
+          const d = await generateDraft(cur.settings, [...cur.drafts, ...newDrafts], a, DEFAULT_TYPE[a.platform], topic, pat ? pat.pattern!.template : "");
           d.patternId = pat ? pat.pattern!.id : null;
           newDrafts.push(d);
         } catch (e: any) {
@@ -106,6 +111,8 @@ export default function Today() {
       <div className="view">
         <PersonaStrip />
 
+        <TrendsBar selected={seedTopics} setSelected={setSeedTopics} />
+
         {showBigGen && (
           <div className="card" style={{ textAlign: "center", padding: 34, marginBottom: 16 }}>
             <div className="display" style={{ fontSize: 20, marginBottom: 6 }}>
@@ -172,6 +179,105 @@ function PersonaStrip() {
           <div className="st">{a.persona.stance || a.persona.voice || ""}</div>
         </div>
       ))}
+    </div>
+  );
+}
+
+function TrendsBar({ selected, setSelected }: { selected: string[]; setSelected: (t: string[]) => void }) {
+  const useBackend = useData((s) => s.data.settings.useBackend);
+  const apiBase = useData((s) => s.data.settings.apiBase);
+  const toast = useUi((s) => s.toast);
+  const [open, setOpen] = useState(false);
+  const [platform, setPlatform] = useState<Platform>("tiktok");
+  const [niche, setNiche] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [results, setResults] = useState<string[]>([]);
+
+  if (!useBackend) return null;
+
+  async function fetchTrends() {
+    if (!niche.trim()) {
+      toast(platform === "tiktok" ? "输入话题/hashtag" : "输入 @handle");
+      return;
+    }
+    setLoading(true);
+    const { data, error } = await apiTrends(apiBase, platform, niche.trim(), 10);
+    setLoading(false);
+    if (error) {
+      if (error === NO_APIFY_TOKEN) toast("后端未配 APIFY_TOKEN");
+      else if (error === UNREACHABLE) toast("后端未连上");
+      else toast("抓取失败:" + error.slice(0, 40));
+      return;
+    }
+    if (!data.length) toast("没抓到趋势,换个词");
+    setResults(data);
+  }
+
+  function toggle(t: string) {
+    setSelected(selected.includes(t) ? selected.filter((x) => x !== t) : [...selected, t]);
+  }
+
+  return (
+    <div className="card" style={{ marginBottom: 16, padding: 14 }}>
+      <div className="row" style={{ justifyContent: "space-between", alignItems: "center" }}>
+        <div>
+          <b className="display" style={{ fontSize: 15 }}>
+            🔥 趋势选题
+          </b>
+          <span className="hint" style={{ marginLeft: 8 }}>
+            {selected.length ? `已选 ${selected.length} 个 · 会喂给「生成」` : "抓热点喂给起草,蹭时效"}
+          </span>
+        </div>
+        <button className="btn ghost sm" onClick={() => setOpen((v) => !v)}>
+          {open ? "收起" : "抓趋势"}
+        </button>
+      </div>
+
+      {!!selected.length && (
+        <div className="row" style={{ gap: 6, marginTop: 10 }}>
+          {selected.map((t) => (
+            <button key={t} className="pill-s ps-brand" style={{ border: "none", cursor: "pointer" }} onClick={() => toggle(t)} title="点掉移除">
+              {t.slice(0, 28)} ✕
+            </button>
+          ))}
+        </div>
+      )}
+
+      {open && (
+        <div style={{ marginTop: 12 }}>
+          <div className="row" style={{ gap: 8, alignItems: "flex-end" }}>
+            <label className="fld" style={{ marginBottom: 0 }}>
+              <span className="lab">平台</span>
+              <select className="in" value={platform} onChange={(e) => setPlatform(e.target.value as Platform)}>
+                <option value="tiktok">TikTok(话题)</option>
+                <option value="x">X(@handle)</option>
+              </select>
+            </label>
+            <label className="fld" style={{ marginBottom: 0, flex: 1 }}>
+              <span className="lab">{platform === "tiktok" ? "话题 / hashtag" : "账号 @handle"}</span>
+              <input className="in" value={niche} onChange={(e) => setNiche(e.target.value)} onKeyDown={(e) => e.key === "Enter" && fetchTrends()} placeholder={platform === "tiktok" ? "buildinpublic" : "@levelsio"} />
+            </label>
+            <button className="btn sm" disabled={loading} onClick={fetchTrends}>
+              {loading ? <span className="spin" /> : "抓取"}
+            </button>
+          </div>
+          {!!results.length && (
+            <div className="row" style={{ gap: 6, marginTop: 12 }}>
+              {results.map((t) => (
+                <button
+                  key={t}
+                  className={"pill-s " + (selected.includes(t) ? "ps-ready" : "ps-mut")}
+                  style={{ border: "none", cursor: "pointer", textAlign: "left" }}
+                  onClick={() => toggle(t)}
+                >
+                  {selected.includes(t) ? "✓ " : "+ "}
+                  {t.slice(0, 36)}
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
     </div>
   );
 }
@@ -270,6 +376,8 @@ function DraftCard({ d, acctOf }: { d: Draft; acctOf: (id: string) => Account | 
   const { toast, setExpanded } = useUi();
   const [editing, setEditing] = useState(false);
   const [editVal, setEditVal] = useState("");
+  const [mediaVal, setMediaVal] = useState("");
+  const [opts, setOpts] = useState<PublishPostOptions>({});
   const [regenning, setRegenning] = useState(false);
 
   const a = acctOf(d.account_id) || ({ handle: "?", color: "#888", persona: {} } as Account);
@@ -279,12 +387,15 @@ function DraftCard({ d, acctOf }: { d: Draft; acctOf: (id: string) => Account | 
   function startEdit() {
     if (editing) {
       const L = editVal.split("\n");
+      const media = mediaVal.split(/[\n,]/).map((s) => s.trim()).filter(Boolean);
       setData((dd) => {
         const t = dd.drafts.find((x) => x.id === d.id);
         if (t) {
           t.hook = L[0] || "";
           t.body = L.slice(1).join("\n");
           t.cta = "";
+          t.mediaUrls = media.length ? media : undefined;
+          t.options = Object.values(opts).some((v) => v) ? opts : undefined;
         }
         recomputeSim(dd.drafts, dd.accounts);
       });
@@ -293,6 +404,8 @@ function DraftCard({ d, acctOf }: { d: Draft; acctOf: (id: string) => Account | 
       toast("已更新");
     } else {
       setEditVal([d.hook, d.body, d.cta].filter(Boolean).join("\n"));
+      setMediaVal((d.mediaUrls || []).join("\n"));
+      setOpts(d.options || {});
       setEditing(true);
     }
   }
@@ -354,11 +467,31 @@ function DraftCard({ d, acctOf }: { d: Draft; acctOf: (id: string) => Account | 
       <div className="bd">{d.body}</div>
       {d.cta && <div className="ct">↳ {d.cta}</div>}
       {editing && (
-        <textarea className="edit" value={editVal} autoFocus onChange={(e) => setEditVal(e.target.value)} />
+        <>
+          <textarea className="edit" value={editVal} autoFocus onChange={(e) => setEditVal(e.target.value)} />
+          <textarea
+            className="edit"
+            style={{ minHeight: 48 }}
+            value={mediaVal}
+            placeholder="媒体 URL(每行一条 / 逗号分隔,TikTok·IG 需要)"
+            onChange={(e) => setMediaVal(e.target.value)}
+          />
+          {d.platform === "tiktok" && (
+            <div className="row" style={{ gap: 12, padding: "0 13px 10px", fontSize: 12, color: "var(--ink-2)" }}>
+              {(["disableComment", "disableDuet", "disableStitch"] as const).map((k) => (
+                <label key={k} style={{ display: "inline-flex", gap: 5, alignItems: "center" }}>
+                  <input type="checkbox" checked={!!opts[k]} onChange={(e) => setOpts((o) => ({ ...o, [k]: e.target.checked }))} />
+                  {k.replace("disable", "禁")}
+                </label>
+              ))}
+            </div>
+          )}
+        </>
       )}
       <div className="fl">
         {simHigh && <span className="pill-s ps-warn">⚠ 与 {d.sim!.peer} 相似 {d.sim!.score.toFixed(2)}</span>}
         {d.disclosure_required && <span className="pill-s ps-warn">⚠ 含推广 · 需披露 #ad</span>}
+        {!!d.mediaUrls?.length && <span className="pill-s ps-blue">📎 {d.mediaUrls.length} 媒体</span>}
         {!flag && <span className="pill-s ps-ready">✓ persona {(d.self.persona || 0).toFixed(2)}</span>}
       </div>
       <div className="acts">
