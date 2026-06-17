@@ -3,7 +3,7 @@ import { useData, useUi } from "../store";
 import { AV, PLATFORMS, PLAT_LABEL } from "../lib/constants";
 import { uid } from "../lib/utils";
 import { tearSwipe } from "../lib/actions";
-import { apiDiscover, apiPullInbox, NO_APIFY_TOKEN, UNREACHABLE, type ViralCandidate } from "../lib/api";
+import { apiDiscover, apiPullInbox, apiZernioAccounts, NO_APIFY_TOKEN, UNREACHABLE, type ViralCandidate, type ZernioAccount } from "../lib/api";
 import type { Account, Platform } from "../lib/types";
 
 function apifyToast(error: string | undefined, toast: (m: string) => void): void {
@@ -24,6 +24,7 @@ export function AccountModal({ id }: { id?: string }) {
   const setData = useData((s) => s.setData);
   const existing = useData((s) => (id ? s.data.accounts.find((a) => a.id === id) : undefined));
   const accountsLen = useData((s) => s.data.accounts.length);
+  const apiBase = useData((s) => s.data.settings.apiBase);
   const { closeModal, toast } = useUi();
 
   const e: Account = existing || ({ handle: "", platform: "x", persona: { voice: "", stance: "", taboo: "", format: "" } } as Account);
@@ -34,6 +35,32 @@ export function AccountModal({ id }: { id?: string }) {
   const [taboo, setTaboo] = useState(e.persona.taboo);
   const [format, setFormat] = useState(e.persona.format);
   const [externalId, setExternalId] = useState(e.externalId || "");
+  const [zList, setZList] = useState<ZernioAccount[] | null>(null);
+  const [zLoading, setZLoading] = useState(false);
+
+  /** 从 zernio 拉取已连接账号,按当前平台过滤,供下拉选择自动填外部 ID。 */
+  async function pullZernio() {
+    setZLoading(true);
+    const { data, error } = await apiZernioAccounts(apiBase);
+    setZLoading(false);
+    if (error) {
+      if (error === UNREACHABLE) toast("后端未连上 · 确认已 npm run dev");
+      else if (error.includes("未配置") || error.includes("ZERNIO_API_KEY")) toast("后端未配 ZERNIO_API_KEY · 去 server/.env 填一个");
+      else toast("拉取失败:" + error.slice(0, 50));
+      return;
+    }
+    const mine = data.filter((a) => a.platform === platform);
+    if (!mine.length) {
+      toast(data.length ? `Zernio 没有 ${PLAT_LABEL[platform]} 账号` : "Zernio 未连接任何账号");
+      setZList([]);
+      return;
+    }
+    setZList(mine);
+    if (mine.length === 1) {
+      setExternalId(mine[0].id);
+      toast("已填入:" + (mine[0].username || mine[0].displayName || mine[0].id));
+    }
+  }
 
   function save() {
     if (!handle.trim()) {
@@ -96,7 +123,22 @@ export function AccountModal({ id }: { id?: string }) {
       </label>
       <label className="fld">
         <span className="lab">外部账号 ID(选填 · zernio account_id / morelogin profile)</span>
-        <input className="in" value={externalId} placeholder="真发布时用;留空则仅 manual" onChange={(ev) => setExternalId(ev.target.value)} />
+        <div className="row" style={{ display: "flex", gap: 8, alignItems: "center" }}>
+          <input className="in" value={externalId} placeholder="真发布时用;留空则仅 manual" onChange={(ev) => setExternalId(ev.target.value)} />
+          <button type="button" className="btn ghost" disabled={zLoading} onClick={pullZernio} title="从已配置的 Zernio 账号自动填入">
+            {zLoading ? "拉取中…" : "从 Zernio 拉取"}
+          </button>
+        </div>
+        {zList && zList.length > 0 && (
+          <select className="in" style={{ marginTop: 6 }} value={externalId} onChange={(ev) => setExternalId(ev.target.value)}>
+            <option value="">选择一个 Zernio 账号…</option>
+            {zList.map((a) => (
+              <option key={a.id} value={a.id}>
+                {(a.username || a.displayName || a.id) + (a.isActive === false ? "(未激活)" : "")}
+              </option>
+            ))}
+          </select>
+        )}
       </label>
       <div className="mfoot">
         <button className="btn ghost" onClick={closeModal}>
