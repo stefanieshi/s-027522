@@ -330,9 +330,27 @@ export async function apiMarkMentionsNotified(apiBase: string, ids: string[]): P
 export const apiListInspiration = (apiBase: string, platform?: string) =>
   getList<Inspiration>(apiBase, "/api/inspiration" + (platform ? "?platform=" + platform : ""), undefined, "GET");
 
-export async function apiRunMonitor(apiBase: string): Promise<{ mentions: number; inspiration: number } | null> {
+export async function apiRunMonitor(apiBase: string, demo = false): Promise<{ bigv: number; mentions: number; inspiration: number; skipped?: string } | null> {
   try {
-    return await postJSON(base(apiBase) + "/api/monitor/run", {});
+    return await postJSON(base(apiBase) + "/api/monitor/run", { demo });
+  } catch {
+    return null;
+  }
+}
+
+export interface BackendStatus {
+  apifyToken: boolean;
+  xSource: string;
+  redditSource: string;
+  anthropic: boolean;
+  zernio: boolean;
+}
+/** 集成状态(布尔/枚举,无密钥)——判断数据源是否接好。后端不可达返回 null。 */
+export async function apiStatus(apiBase: string): Promise<BackendStatus | null> {
+  try {
+    const res = await fetch(base(apiBase) + "/api/status");
+    if (!res.ok) return null;
+    return (await res.json()) as BackendStatus;
   } catch {
     return null;
   }

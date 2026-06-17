@@ -312,7 +312,7 @@ function PersonaTab() {
         <div className="acct-grid">
           {accounts.map((a) => (
             <div className="acct" key={a.id}>
-              <button className="x" onClick={() => del(a.id)}>
+              <button className="x" title="删除账号" aria-label="删除账号" onClick={() => del(a.id)}>
                 ✕
               </button>
               <div className="hd">
