@@ -7,6 +7,7 @@
  * 调用方式:Apify run-sync-get-dataset-items,直接拿 dataset 数组。
  */
 import { xDiscover, xUserLatest, xReplies } from "./x.js";
+import { redditDiscover, redditUserLatest, redditComments } from "./reddit.js";
 
 type Platform = "x" | "tiktok" | "instagram" | "reddit";
 
@@ -14,6 +15,8 @@ export const NO_TOKEN = "NO_APIFY_TOKEN";
 
 /** X 免费源(twscrape)开关:X_SOURCE=twscrape 时,x 平台抓取走 sidecar。 */
 const useTwscrape = () => process.env.X_SOURCE === "twscrape";
+/** Reddit 免费源开关:REDDIT_SOURCE=public 时,reddit 平台走公开 .json(无需 key)。 */
+const useRedditPublic = () => process.env.REDDIT_SOURCE === "public";
 
 const ACTORS = {
   tiktokHashtag: process.env.APIFY_ACTOR_TIKTOK_HASHTAG || "clockworks/tiktok-hashtag-scraper",
@@ -90,6 +93,7 @@ export async function discoverViral(opts: { platform: Platform; query: string; l
   if (!q) return [];
 
   if (opts.platform === "x" && useTwscrape()) return xDiscover(q, limit);
+  if (opts.platform === "reddit" && useRedditPublic()) return redditDiscover(q, limit);
 
   if (opts.platform === "tiktok") {
     const items = await runActor(ACTORS.tiktokHashtag, { hashtags: [q.replace(/^#/, "")], resultsPerPage: limit }, limit);
@@ -137,6 +141,7 @@ export async function pullComments(opts: { platform: Platform; postUrls: string[
   if (!urls.length) return [];
 
   if (opts.platform === "x" && useTwscrape()) return xReplies(urls, limit);
+  if (opts.platform === "reddit" && useRedditPublic()) return redditComments(urls, limit);
 
   if (opts.platform === "instagram") {
     const items = await runActor(ACTORS.igComments, { directUrls: urls, resultsLimit: limit }, limit);
@@ -203,6 +208,7 @@ export async function fetchAccountLatest(opts: { platform: Platform; handle: str
   if (!h) return [];
 
   if (opts.platform === "x" && useTwscrape()) return xUserLatest(h, limit);
+  if (opts.platform === "reddit" && useRedditPublic()) return redditUserLatest(h, limit);
 
   if (opts.platform === "x") {
     const items = await runActor(ACTORS.xProfile, { profileUrls: [`https://x.com/${h}`], resultsLimit: limit }, limit);

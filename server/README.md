@@ -51,6 +51,7 @@ src/
 - `ZERNIO_API_KEY` — zernio 官方发布/分析(留空则 zernio 渠道报错,manual 不受影响)。
 - `APIFY_TOKEN` — 抓取摄入(留空则 discover/pull/trends 返回 `NO_APIFY_TOKEN`,前端会提示)。
 - `X_SOURCE` — `apify`(默认)或 `twscrape`(免费 X 抓取,需跑 `x-scraper/` sidecar + 加 X 小号;见 [x-scraper/README](./x-scraper/README.md))。设为 twscrape 后 X 走免费源,TikTok/IG/Reddit 仍用 Apify。
+- `REDDIT_SOURCE` — `apify`(默认)或 `public`(**免费**,用 Reddit 公开 `.json` 官方只读接口,**无需 key、无需 sidecar**)。设为 public 后 Reddit 走免费源;高频可选配 `REDDIT_USER_AGENT` 或官方 OAuth 提限额。
 - `MORELOGIN_*` — 指纹浏览器渠道(需本机 MoreLogin 客户端 + Playwright)。
 - `DB_PATH` — SQLite 路径(默认 `./data`,已 gitignore)。
 - `ANALYTICS_REFRESH_MIN` — 互动数据回收频率(分钟)。
