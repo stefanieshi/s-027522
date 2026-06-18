@@ -1,138 +1,65 @@
-export type Platform = "x" | "tiktok" | "instagram" | "reddit";
-export type DraftType = "x_post" | "tiktok_script" | "ig_caption" | "reddit_post";
-export type DraftStatus = "pending" | "approved" | "published" | "rejected";
-export type ResultTier = "win" | "mid" | "flop";
+/** Domain types for Resonance · Reply Copilot. */
 
-export interface Persona {
-  voice: string;
-  stance: string;
-  taboo: string;
-  format: string;
+export type Platform = "x" | "reddit";
+export type Tab = "briefing" | "triage" | "queue" | "studio" | "voice";
+export type Safety = "green" | "amber" | "red";
+
+/** A scored reply opportunity surfaced in Triage. */
+export interface Op {
+  _id: string;
+  fit: number;
+  why_now: string;
+  decay_hours: number;
+  angle: string;
+  text: string;
+  // X
+  author?: string;
+  handle?: string;
+  verified?: boolean;
+  likes?: number;
+  reposts?: number;
+  replies?: number;
+  // Reddit
+  subreddit?: string;
+  title?: string;
+  upvotes?: number;
+  comments?: number;
 }
 
-export interface Account {
-  id: string;
-  handle: string;
-  platform: Platform;
-  color: string;
-  persona: Persona;
-  /** zernio 的 account_id 或 morelogin 的 profile/uniqueId(真发布时用)。 */
-  externalId?: string;
-}
-
-export type Channel = "manual" | "zernio" | "morelogin";
-
-export interface Teardown {
-  hook_type: string;
-  structure: string;
-  emotional_trigger: string;
-  why_it_worked: string;
-}
-
-export interface Pattern {
-  id: string;
-  template: string;
-}
-
-export interface Swipe {
-  id: string;
-  platform: Platform;
-  source: string;
-  metrics: string;
-  raw: string;
-  teardown: Teardown | null;
-  pattern: Pattern | null;
-}
-
-export interface Sim {
-  score: number;
-  peer: string;
-}
-
+/** A generated reply option for an Op. */
 export interface Draft {
-  id: string;
-  account_id: string;
-  platform: Platform;
-  type: DraftType;
-  topic: string;
-  hook: string;
-  body: string;
-  cta: string;
-  disclosure_required: boolean;
-  self: { hook: number; persona: number };
-  patternId: string | null;
-  scheduledAt: number | null;
-  result: { tier: ResultTier; loggedAt: number } | null;
-  promoted: boolean;
-  sim: Sim | null;
-  status: DraftStatus;
-  created: number;
-  publishedAt?: number;
-  /** 真发布后回填:zernio/morelogin 的帖 id。 */
-  externalPostId?: string;
-  /** 已交后端排期时回填:DB 里 scheduled_posts.id。 */
-  scheduleId?: string;
-  /** 真实互动数据(后端 zernioAnalytics 回收)。 */
-  metrics?: { views: number | null; likes: number | null; engagementRate: number | null; fetchedAt: string | null };
-  /** 媒体附件(TikTok/IG 等媒体平台必需)。 */
-  mediaUrls?: string[];
-  /** 平台专属发布选项(来自 repo1)。 */
-  options?: PublishPostOptions;
-  /** 真发布后的帖子链接。 */
-  publishedUrl?: string;
-}
-
-export interface PublishPostOptions {
-  privacy?: string;
-  disableComment?: boolean;
-  disableDuet?: boolean;
-  disableStitch?: boolean;
-  madeForKids?: boolean;
-  categoryId?: string;
-}
-
-export interface InboxItem {
-  id: string;
-  platform: Platform;
-  from: string;
-  color: string;
-  msg: string;
+  angle: string;
   reply: string;
-  status: "new" | "sent";
-  flagged: boolean;
+  sounds: number | null;
+  safety: Safety;
+  note: string;
 }
 
-export interface Templates {
-  comment: string;
-  dm: string;
+/** An item awaiting human review in the Approval queue. */
+export interface QueueItem {
+  id: string;
+  platform: Platform;
+  target: string;
+  text: string;
+  sounds: number | null;
+  safety: Safety;
+  note: string;
+  status: "ready" | "posted";
 }
 
-export interface Settings {
-  apiKey: string;
-  model: string;
-  simThreshold: number;
-  postStartHour: number;
-  postEndHour: number;
-  minGapMin: number;
-  dailyPerAccount: number;
-  autoReply: boolean;
-  /** 接后端真发布:开了才走 /api/publish、/api/schedule;关了走本地/mock。 */
-  useBackend: boolean;
-  apiBase: string;
-  channel: Channel;
-  /** 大V雷达:桌面通知 + 提醒音 */
-  notifyDesktop: boolean;
-  /** 上手清单已忽略 */
-  onboardingDismissed?: boolean;
+/** Trained voice profile. */
+export interface Voice {
+  voice_dna: string;
+  tone: string;
+  signature_moves: string[];
+  vocabulary: string[];
+  avoid: string[];
 }
 
-export interface AppData {
-  accounts: Account[];
-  swipes: Swipe[];
-  drafts: Draft[];
-  inbox: InboxItem[];
-  templates: Templates;
-  settings: Settings;
+/** An original post generated in Studio. */
+export interface StudioPost {
+  format: string;
+  text: string;
+  safety: Safety;
+  note: string;
 }
-
-export type ViewId = "today" | "calendar" | "inbox" | "radar" | "analytics" | "voice" | "settings";
